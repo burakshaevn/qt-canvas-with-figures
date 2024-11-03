@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Eye off.png</file>
+        <file>Eye.png</file>
+        <file>Trash.png</file>
+        <file>Search.png</file>
+        <file>Box.png</file>
+    </qresource>
+</RCC>
