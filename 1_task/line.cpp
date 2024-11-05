@@ -1,53 +1,3 @@
-// #include "line.h"
-
-// Line::Line() = default;
-
-// Line::Line(int x1, int y1, int x2, int y2, const QPen& pen)
-//     : Figure(x1, y1, x2 - x1, y2 - y1, pen)
-//     , x2_(x2)
-//     , y2_(y2)
-// {
-//     line_item_ = new QGraphicsLineItem(x1, y1, x2, y2);
-//     line_item_->setPen(pen);
-// }
-
-// Line::~Line() = default;
-
-// void Line::MoveTo(const int x, const int y) {
-//     int dx = x - x_;
-//     int dy = y - y_;
-//     x_ = x;
-//     y_ = y;
-//     x2_ += dx;
-//     y2_ += dy;
-//     if (line_item_) {
-//         line_item_->setLine(x_, y_, x2_, y2_);
-//     }
-// }
-
-// void Line::SetSize([[maybe_unused]] const int w, [[maybe_unused]] const int h) {
-//     // Размер линии не изменяется таким образом. Изменение положения второй точки требует отдельного метода.
-// }
-
-// void Line::Show(QGraphicsScene *scene) {
-//     if (!line_item_) {
-//         line_item_ = new QGraphicsLineItem(x_, y_, x2_, y2_);
-//     }
-//     else if (line_item_->scene() != scene) {
-//         scene->addItem(line_item_);
-//         scene->update();
-//     }
-//     line_item_->setPen(pen_);
-//     line_item_->setVisible(is_visible_);
-// }
-
-// void Line::RemoveFromScene(QGraphicsScene* scene) {
-//     if (line_item_ && scene->items().contains(line_item_)) {
-//         scene->removeItem(line_item_);
-//         delete line_item_;
-//         line_item_ = nullptr;
-//     }
-// }
 #include "line.h"
 
 Line::Line() = default;
@@ -78,8 +28,15 @@ void Line::MoveTo(const int dx, const int dy) {
     }
 }
 
-void Line::SetSize([[maybe_unused]] const int w, [[maybe_unused]] const int h) {
-    // Метод пока не используется, так как линия изменяется через координаты.
+void Line::SetSize(const int w, const int h) {
+    // Изменяем конечные координаты линии в зависимости от новых ширины и высоты
+    x2_ = x_ + w;
+    y2_ = y_ + h;
+
+    // Обновляем позицию линии на сцене
+    if (line_item_) {
+        line_item_->setLine(x_, y_, x2_, y2_);
+    }
 }
 
 void Line::Show(QGraphicsScene *scene) {
