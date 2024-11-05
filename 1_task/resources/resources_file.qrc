@@ -5,5 +5,7 @@
         <file>Trash.png</file>
         <file>Search.png</file>
         <file>Box.png</file>
+        <file>Check.png</file>
+        <file>Refresh cw.png</file>
     </qresource>
 </RCC>
