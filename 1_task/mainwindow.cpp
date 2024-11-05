@@ -133,34 +133,26 @@ std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
     while (true) {
         if (current_figure_.get()->GetFigureType() == FigureType::circle_) {
             int minRadius = minSize / 2;
-            int maxRadius = std::min(maxWidth, maxHeight) / 4; // Уменьшение радиуса для безопасности
-
+            int maxRadius = std::min(maxWidth, maxHeight) / 4;
             int radius = GetRandomNumber(minRadius, maxRadius);
-            w = h = radius * 2; // Устанавливаем диаметр
-
+            w = h = radius * 2;
             int maxX = maxWidth - w;
             int maxY = maxHeight - h;
-
-            // Определяем координаты, чтобы круг находился в пределах сцены
             x = GetRandomNumber(0, maxX);
             y = GetRandomNumber(0, maxY);
         }
         else if (current_figure_.get()->GetFigureType() == FigureType::square_) {
             w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
-
             int maxX = ui->graphicsView->width() - w;
             int maxY = ui->graphicsView->height() - h;
-
             x = GetRandomNumber(0, maxX);
             y = GetRandomNumber(0, maxY);
         }
         else {
             w = GetRandomNumber(minSize, maxWidth);
             h = GetRandomNumber(minSize, maxHeight);
-
             int maxX = (ui->graphicsView->width() - w) / 2;
             int maxY = (ui->graphicsView->height() - h) / 2;
-
             x = GetRandomNumber(0, maxX);
             y = GetRandomNumber(0, maxY);
         }
@@ -339,24 +331,33 @@ void MainWindow::on_pushButton_search_size_clicked() {
         QString index_string = ui->lineEdit_index_size->text();
         if (!index_string.isEmpty()) {
             bool is_found = false;
-            size_t index = static_cast<size_t>(index_string.toInt() - 1);
+            size_t target_index = static_cast<size_t>(index_string.toInt() - 1);
+            size_t current_type_count = 0;  // Счетчик для индекса конкретного типа
 
+            // Если current_figure_ не установлен, просто выберем из всех фигур
             for (size_t i = 0; i < figures_.size(); ++i) {
                 figures_.at(i)->SetPen(QColor(QString("#7b6f5d")), 3);
-                if (i == index && (current_figure_ == nullptr || figures_.at(i).get()->GetFigureType() == current_figure_.get()->GetFigureType())) {
-                    ui->lineEdit_current_x->setText(QString::number(figures_.at(i)->GetX()));
-                    ui->lineEdit_current_y->setText(QString::number(figures_.at(i)->GetY()));
-                    ui->lineEdit_current_w->setText(QString::number(figures_.at(i)->GetW()));
-                    ui->lineEdit_current_h->setText(QString::number(figures_.at(i)->GetH()));
-                    figures_.at(i)->SetPen(QColor(QString("#e9a000")), 5);  // выделение выбранной фигуры
-                    is_found = true;
-                    // break;
+
+                // Проверяем, если current_figure_ установлен, фильтруем по типу текущей фигуры
+                if (current_figure_ == nullptr || figures_.at(i).get()->GetFigureType() == current_figure_.get()->GetFigureType()) {
+                    if (current_type_count == target_index) {
+                        ui->lineEdit_current_x->setText(QString::number(figures_.at(i)->GetX()));
+                        ui->lineEdit_current_y->setText(QString::number(figures_.at(i)->GetY()));
+                        ui->lineEdit_current_w->setText(QString::number(figures_.at(i)->GetW()));
+                        ui->lineEdit_current_h->setText(QString::number(figures_.at(i)->GetH()));
+                        figures_.at(i)->SetPen(QColor(QString("#e9a000")), 5);
+                        is_found = true;
+                    }
+                    current_type_count++;  // Увеличиваем счетчик для этого типа или общего списка
                 }
                 figures_.at(i)->Show(scene.get());
             }
+
             if (!is_found) {
-                QMessageBox::warning(this, "Ошибка", "Фигура с данным индексом не найдена или не соответствует выбранному типу.");
+                QMessageBox::warning(this, "Ошибка", "Фигура с данным индексом не найдена.");
             }
+        } else {
+            QMessageBox::warning(this, "Ошибка", "Введите корректный индекс.");
         }
     } else {
         QMessageBox::critical(this, "Ошибка", "Массив фигур пуст. Добавьте фигуры для поиска.");
@@ -401,8 +402,7 @@ void MainWindow::on_pushButton_ok_size_clicked()
         int new_h = size_fields_filled ? ui->lineEdit_new_h->text().toInt() : figures_.at(0)->GetH();
 
         // Проверка корректности значений
-        if (/*(coord_fields_filled && !CoordsIsCorrect(new_x, new_y)) ||*/
-            (size_fields_filled && !SizeIsCorrect(new_w, new_h))) {
+        if (size_fields_filled && !SizeIsCorrect(new_w, new_h)) {
             QMessageBox::warning(this, "Ошибка", "Некорректный ввод полей с координатами или размерами.");
             return;
         }
@@ -417,7 +417,7 @@ void MainWindow::on_pushButton_ok_size_clicked()
                 figures_.at(i)->SetPen(QColor(QString("#7b6f5d")), 3);
 
                 // Проверка на совпадение индекса и типа фигуры
-                if (i == index && (current_figure_ == nullptr || figures_.at(i).get()->GetFigureType() == current_figure_.get()->GetFigureType()/*typeid(figures_.at(i).get()) == typeid(current_figure_.get()*/)) {
+                if (i == index && (current_figure_ == nullptr || figures_.at(i).get()->GetFigureType() == current_figure_.get()->GetFigureType())) {
                     if (MoveIsCorrect(figures_.at(i).get(), figures_.at(i).get()->GetX(), figures_.at(i).get()->GetY(), new_w, new_h, dx, dy)){
                         if (coord_fields_filled) {
                             figures_.at(i)->MoveTo(dx, dy);
@@ -446,7 +446,7 @@ void MainWindow::on_pushButton_ok_size_clicked()
         else {
             for (size_t i = 0; i < figures_.size(); ++i) {
                 // Проверка на совпадение типа фигуры
-                if (current_figure_ == nullptr || typeid(*figures_.at(i)) == typeid(*current_figure_)/*figures_.at(i).get()->GetFigureType() == current_figure_.get()->GetFigureType()*/) {
+                if (current_figure_ == nullptr || typeid(*figures_.at(i)) == typeid(*current_figure_)) {
 
                     // Проверяем, будет ли корректна конкретная фигура figures_.at(i),
                     // если в ней поменять X, Y, Width или Height. Если хоть один будет =false,
@@ -466,7 +466,6 @@ void MainWindow::on_pushButton_ok_size_clicked()
                     }
                     if (!result1 || !result2){
                         continue;
-                        //has_been_mistakes = true;
                     }
                 }
             }
@@ -495,7 +494,7 @@ void MainWindow::on_checkBox_all_size_stateChanged(int arg1)
                 is_found = true;
             }
             // Иначе выделяем только те фигуры, которые соответствуют типу current_figure_
-            else if (typeid(*figure) == typeid(*current_figure_)/*figure->GetFigureType() == current_figure_.get()->GetFigureType()*/) {
+            else if (typeid(*figure) == typeid(*current_figure_)) {
                 figure->SetPen(QColor(QString("#e9a000")), 5);
                 is_found = true;
             }

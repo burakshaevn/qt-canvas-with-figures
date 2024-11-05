@@ -62,7 +62,6 @@ private:
 
     bool CoordsIsCorrect(const int x, const int y) const;
     bool SizeIsCorrect(const int w, const int h) const;
-    // bool FigureIsCorrect(const int x, const int y, const int w, const int h) const;
     bool MoveIsCorrect(Figure* figure, const int x, const int y, const int w, const int h, const int move_x, const int move_y) const;
     bool NumberIsCorrect(const int num) const;
     std::tuple<int, int, int, int> GetCorrectFigure() const;
