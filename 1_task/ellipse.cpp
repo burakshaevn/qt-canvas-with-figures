@@ -33,7 +33,7 @@ void Ellipse::Show(QGraphicsScene *scene) {
     ellipse_item_->setVisible(is_visible_);
 }
 
-void Ellipse::SetSize(const int w, [[maybe_unused]] const int h) {
+void Ellipse::SetSize(const int w, const int h) {
     radius_1_ = w / 2;
     radius_2_ = h / 2;
     w_ = radius_1_ * 2;

@@ -15,7 +15,7 @@ public:
     Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::ellipse_);
     virtual ~Ellipse();
     void MoveTo(int x, int y) override;
-    void SetSize(const int w, [[maybe_unused]] const int h) override;
+    void SetSize(const int w, const int h) override;
     void Show(QGraphicsScene *scene) override;
     void RemoveFromScene(QGraphicsScene* scene) override;
 

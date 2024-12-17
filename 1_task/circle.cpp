@@ -14,7 +14,6 @@ Circle::Circle(int x, int y, int radius, const QPen& pen)
     ellipse_item_->setPen(pen);
 }
 
-
 Circle::~Circle() = default;
 
 void Circle::SetSize(const int w, [[maybe_unused]] const int h) {
