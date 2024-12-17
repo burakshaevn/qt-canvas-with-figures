@@ -1,1 +1,1 @@
-# object-oriented-programming
+# qt-canvas-with-figures
