@@ -23,13 +23,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtWidgetsProject
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        circle.h circle.cpp
+
         resources/resources_file.qrc
         rectangle.h rectangle.cpp
         line.h line.cpp
-        figure.h figure.cpp
+
         square.h square.cpp
         ellipse.h ellipse.cpp
+        domain.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QtWidgetsProject APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

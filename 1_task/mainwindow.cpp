@@ -37,7 +37,6 @@ void MainWindow::FillComboBox(){
     ui->comboBox->addItem("Не выбрано");
     ui->comboBox->setCurrentText("Не выбрано");
     ui->comboBox->addItem("Эллипс");
-    ui->comboBox->addItem("Круг");
     ui->comboBox->addItem("Прямоугольник");
     ui->comboBox->addItem("Квадрат");
     ui->comboBox->addItem("Линия");
@@ -77,47 +76,82 @@ int MainWindow::GetRandomNumber(const int min, const int max) const {
    return distribution(engine);
 }
 
-bool MainWindow::CoordsIsCorrect(const int x, const int y) const{
+MainWindow::FigureVariant MainWindow::CreateFigure(FigureType type, int x, int y, int w, int h) {
+    switch (type) {
+    case FigureType::ellipse_:
+        return FigureVariant(Ellipse(x, y, w / 2, h / 2)); // Явно создаем std::variant с Ellipse
+    case FigureType::rectangle_:
+        return FigureVariant(Rectangle(x, y, w, h)); // Явно создаем std::variant с Rectangle
+    case FigureType::square_:
+        return FigureVariant(Square(x, y, std::min(w, h))); // Явно создаем std::variant с Square
+    case FigureType::line_:
+        return FigureVariant(Line(x, y, w, h)); // Явно создаем std::variant с Line
+    default:
+        throw std::invalid_argument("Unknown figure type");
+    }
+}
+
+bool MainWindow::CoordsIsCorrect(const int x, const int y) const {
     return x >= 0 && x <= ui->graphicsView->width() &&
            y >= 0 && y <= ui->graphicsView->height();
 }
-bool MainWindow::SizeIsCorrect(const int w, const int h) const{
+bool MainWindow::SizeIsCorrect(const int w, const int h) const {
     return w > 0 && h > 0 &&
            w <= ui->graphicsView->width() &&
            h <= ui->graphicsView->height();
 }
-bool MainWindow::MoveIsCorrect(Figure* figure, const int x, const int y, const int w, const int h, const int dx, const int dy) const {
-    if (figure->GetFigureType() == FigureType::circle_) {
-        return (x + dx) >= 0 && (y + dy) >= 0 &&
-               ((x + w) + dx) <= scene->width() &&
-               ((y + w) + dy) <= scene->height();
+// bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int h, const int dx, const int dy) const {
+//     if (current_figure_ == FigureType::ellipse_) {
+//         return (x + dx) >= 0 && (y + dy) >= 0 &&
+//                ((x + w) + dx) <= scene->width() &&
+//                ((y + h) + dy) <= scene->height();
+//     }
+//     else if (current_figure_ == FigureType::rectangle_) {
+//         return (x + dx) >= 0 && (y + dy) >= 0 &&
+//                ((x + w) + dx) <= scene->width() &&
+//                ((y + h) + dy) <= scene->height();
+//     }
+//     else if (current_figure_ == FigureType::square_) {
+//         return (x + dx) >= 0 && (y + dy) >= 0 &&
+//                ((x + w) + dx) <= scene->width() &&
+//                ((y + w) + dy) <= scene->height();
+//     }
+//     else if (current_figure_ == FigureType::line_) {
+//         int x1_new = x + dx;
+//         int y1_new = y + dy;
+//         int x2_new = x + w + dx;
+//         int y2_new = y + h + dy;
+//         return x1_new >= 0 && x1_new <= scene->width() &&
+//                y1_new >= 0 && y1_new <= scene->height() &&
+//                x2_new >= 0 && x2_new <= scene->width() &&
+//                y2_new >= 0 && y2_new <= scene->height();
+//     }
+//     return false; // если тип фигуры неизвестен
+// }
+
+bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int h, const int dx, const int dy) const {
+    // Новые координаты после перемещения
+    int new_x = x + dx;
+    int new_y = y + dy;
+
+    // Проверяем, что новые координаты не выходят за пределы сцены
+    bool is_x_valid = new_x >= 0 && (new_x + w) <= scene->width();
+    bool is_y_valid = new_y >= 0 && (new_y + h) <= scene->height();
+
+    // Для линии проверяем обе точки
+    if (current_figure_ == FigureType::line_) {
+        int x1_new = new_x;
+        int y1_new = new_y;
+        int x2_new = new_x + w;
+        int y2_new = new_y + h;
+
+        is_x_valid = x1_new >= 0 && x1_new <= scene->width() &&
+                     x2_new >= 0 && x2_new <= scene->width();
+        is_y_valid = y1_new >= 0 && y1_new <= scene->height() &&
+                     y2_new >= 0 && y2_new <= scene->height();
     }
-    else if (figure->GetFigureType() == FigureType::ellipse_) {
-        return (x + dx) >= 0 && (y + dy) >= 0 &&
-               ((x + w) + dx) <= scene->width() &&
-               ((y + h) + dy) <= scene->height();
-    }
-    else if (figure->GetFigureType() == FigureType::rectangle_) {
-        return (x + dx) >= 0 && (y + dy) >= 0 &&
-               ((x + w) + dx) <= scene->width() &&
-               ((y + h) + dy) <= scene->height();
-    }
-    else if (figure->GetFigureType() == FigureType::square_) {
-        return (x + dx) >= 0 && (y + dy) >= 0 &&
-               ((x + w) + dx) <= scene->width() &&
-               ((y + w) + dy) <= scene->height();
-    }
-    else if (figure->GetFigureType() == FigureType::line_) {
-        int x1_new = x + dx;
-        int y1_new = y + dy;
-        int x2_new = x + w + dx;
-        int y2_new = y + h + dy;
-        return x1_new >= 0 && x1_new <= scene->width() &&
-               y1_new >= 0 && y1_new <= scene->height() &&
-               x2_new >= 0 && x2_new <= scene->width() &&
-               y2_new >= 0 && y2_new <= scene->height();
-    }
-    return false; // если тип фигуры неизвестен
+
+    return is_x_valid && is_y_valid;
 }
 
 std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
@@ -131,17 +165,7 @@ std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
     int h = 0;
 
     while (true) {
-        if (current_figure_.get()->GetFigureType() == FigureType::circle_) {
-            int minRadius = minSize / 2;
-            int maxRadius = std::min(maxWidth, maxHeight) / 4;
-            int radius = GetRandomNumber(minRadius, maxRadius);
-            w = h = radius * 2;
-            int maxX = maxWidth - w;
-            int maxY = maxHeight - h;
-            x = GetRandomNumber(0, maxX);
-            y = GetRandomNumber(0, maxY);
-        }
-        else if (current_figure_.get()->GetFigureType() == FigureType::square_) {
+        if (current_figure_ == FigureType::square_) {
             w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
             int maxX = ui->graphicsView->width() - w;
             int maxY = ui->graphicsView->height() - h;
@@ -156,7 +180,7 @@ std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
             x = GetRandomNumber(0, maxX);
             y = GetRandomNumber(0, maxY);
         }
-        if (MoveIsCorrect(current_figure_.get(), x, y, w, h, 0, 0)){
+        if (MoveIsCorrect(x, y, w, h, 0, 0)){
             return {x, y, w, h};
         }
         else{
@@ -170,38 +194,34 @@ std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
 // то разрешаем перейти к окнам создания, редактирования размеров и координат
 void MainWindow::on_comboBox_currentIndexChanged(int index)
 {
-    ClearLineEdit();
-    ui->checkBox_all_size->setCheckState(Qt::Unchecked);
+    ClearLineEdit();  // Очистка всех Input-полей
 
-    // Используем std::make_unique для создания объекта
+    current_figure_ = FigureType::not_defined_; // Сброс текущего типа фигуры
+
     switch (index) {
-    case 0:
-        current_figure_.reset();
+    case 0: // «Не выбрано»
+        current_figure_ = FigureType::not_defined_;
         break;
-    case 1:
-        current_figure_ = std::make_unique<Ellipse>();
-        current_figure_.get()->SetFigureType(FigureType::ellipse_);
+    case 1: // «Эллипс»
+        current_figure_ = FigureType::ellipse_;
         break;
-    case 2:
-        current_figure_ = std::make_unique<Circle>();
-        current_figure_.get()->SetFigureType(FigureType::circle_);
+    case 2: // «Прямоугольник»
+        current_figure_ = FigureType::rectangle_;
         break;
-    case 3:
-        current_figure_ = std::make_unique<Rectangle>();
-        current_figure_.get()->SetFigureType(FigureType::rectangle_);
+    case 3: // «Квадрат»
+        current_figure_ = FigureType::square_;
         break;
-    case 4:
-        current_figure_ = std::make_unique<Square>();
-        current_figure_.get()->SetFigureType(FigureType::square_);
+    case 4: // «Линия»
+        current_figure_ = FigureType::line_;
         break;
-    case 5:
-        current_figure_ = std::make_unique<Line>();
-        current_figure_.get()->SetFigureType(FigureType::line_);
+    default:
+        QMessageBox::warning(this, "Ошибка", "Неизвестный тип фигуры.");
         break;
     }
 
-    if (index > 0) {
-        ui->stackedWidget->setCurrentIndex(1);
+    // Если выбран конкретный тип, дополнительно активируем StackWidget
+    if (current_figure_ != FigureType::not_defined_) {
+        ui->stackedWidget->setCurrentIndex(1);  // Переключение к отображению создания/редактирования
     }
 }
 
@@ -211,7 +231,7 @@ void MainWindow::on_pushButton_random_create_clicked() {
     ui->lineEdit_x->setText(QString::number(x));
     ui->lineEdit_y->setText(QString::number(y));
     ui->lineEdit_w->setText(QString::number(w));
-    if (current_figure_.get()->GetFigureType() == FigureType::circle_ || current_figure_.get()->GetFigureType() == FigureType::square_){
+    if (current_figure_ == FigureType::square_){
         ui->lineEdit_h->setText(QString::number(w));
     }
     else{
@@ -219,9 +239,8 @@ void MainWindow::on_pushButton_random_create_clicked() {
     }
 }
 
-void MainWindow::on_pushButton_ok_create_clicked()
-{
-    if (current_figure_ != nullptr){
+void MainWindow::on_pushButton_ok_create_clicked() {
+    if (current_figure_ != FigureType::not_defined_) {
         size_t count = static_cast<size_t>(ui->lineEdit_count->text().toInt());
 
         int x{};
@@ -229,8 +248,6 @@ void MainWindow::on_pushButton_ok_create_clicked()
         int w{};
         int h{};
 
-        // Изначально считаем, что все фигуры отрисовались с корректными размерами и позициями.
-        // Если переменная будет равна true, по завершение цикла разово выведем сообщение об ошибках, если они были
         bool has_been_mistakes = false;
         for (size_t i = 0; i < count; ++i) {
             if (count == 1) {
@@ -238,129 +255,90 @@ void MainWindow::on_pushButton_ok_create_clicked()
                 y = ui->lineEdit_y->text().toInt();
                 w = ui->lineEdit_w->text().toInt();
                 h = ui->lineEdit_h->text().toInt();
-            }
-            else {
+            } else {
                 auto [x_, y_, w_, h_] = GetCorrectFigure();
                 x = x_;
                 y = y_;
                 w = w_;
                 h = h_;
             }
-            std::unique_ptr<Figure> new_figure_;
-            switch (current_figure_.get()->GetFigureType()) {
-            case FigureType::not_defined_:
-                new_figure_ = nullptr;
-                break;
-            case FigureType::circle_:
-                new_figure_ = std::make_unique<Circle>(x, y, w / 2);
-                break;
-            case FigureType::ellipse_:
-                new_figure_ = std::make_unique<Ellipse>(x, y, w / 2, h / 2);
-                break;
-            case FigureType::rectangle_:
-                new_figure_ = std::make_unique<Rectangle>(x, y, w, h);
-                break;
-            case FigureType::square_:
-                new_figure_ = std::make_unique<Square>(x, y, w);
-                break;
-            case FigureType::line_:
-                new_figure_ = std::make_unique<Line>(x, y, w, h);
-                break;
-            }
 
-            if (MoveIsCorrect(new_figure_.get(), new_figure_->GetX(), new_figure_->GetY(),
-                              new_figure_->GetW(), new_figure_->GetH(),
-                            0, 0)) {
-                new_figure_->MoveTo(0, 0);
-                new_figure_->Show(scene.get());
-                figures_.push_back(std::move(new_figure_));
-            }
-            else {
-                has_been_mistakes = true;
+            try {
+                FigureVariant new_figure = CreateFigure(current_figure_, x, y, w, h);
+
+                if (MoveIsCorrect(x, y, w, h, 0, 0)) {
+                    ShowFigure(new_figure, scene.get());
+                    figures_.push_back(new_figure);
+                } else {
+                    has_been_mistakes = true;
+                }
+            } catch (const std::invalid_argument& e) {
+                QMessageBox::critical(this, "Ошибка", e.what());
+                return;
             }
         }
-        if (has_been_mistakes){
+
+        if (has_been_mistakes) {
             QMessageBox::warning(this, "Ошибка", "Некоторые фигуры с некорректными координатами не были отображены.");
         }
         ClearLineEdit();
-    }
-    else{
+    } else {
         QMessageBox::critical(this, "Ошибка", "Невозможно выполнить операцию. Выберите тип фигуры.");
     }
 }
 
-void MainWindow::on_pushButton_trash_clicked() {
-    if (!figures_.empty()) {
-        auto it = figures_.begin();
-        bool anyDeleted = false;
-
-        while (it != figures_.end()) {
-            if (current_figure_ == nullptr || typeid(**it) == typeid(*current_figure_)) {
-                (it->get())->RemoveFromScene(scene.get()); // Удаление из сцены
-                it = figures_.erase(it); // Получаем следующий итератор
-                anyDeleted = true;
-                ui->checkBox_all_size->setCheckState(Qt::Unchecked);
-            } else {
-                ++it;
-            }
-        }
-        if (!anyDeleted) {
-            QMessageBox::information(this, "Информация", "Фигуры указанного типа отсутствуют для удаления.");
-        }
-    } else {
-        QMessageBox::critical(this, "Ошибка", "Массив фигур пуст. Добавьте фигуры для удаления.");
-    }
-}
-
-void MainWindow::on_pushButton_eye_clicked() {
-    if (!figures_.empty()) {
-        for (auto& figure : figures_) {
-            // Если current_figure_ == nullptr, обрабатываем все фигуры, иначе только фигуры того же типа
-            if (current_figure_ == nullptr || figure.get()->GetFigureType() == current_figure_.get()->GetFigureType()) {
-                figure->SetVisible(!figure->GetVisible());
-                figure->Show(scene.get());
-            }
-        }
-    } else {
-        QMessageBox::critical(this, "Ошибка", "Массив фигур пуст. Добавьте фигуры для обработки.");
-    }
-}
-
 void MainWindow::on_pushButton_search_size_clicked() {
-    if (!figures_.empty()) {
-        QString index_string = ui->lineEdit_index_size->text();
-        if (!index_string.isEmpty()) {
-            bool is_found = false;
-            size_t target_index = static_cast<size_t>(index_string.toInt() - 1);
-            size_t current_type_count = 0;  // Счетчик для индекса конкретного типа
-
-            // Если current_figure_ не установлен, просто выберем из всех фигур
-            for (size_t i = 0; i < figures_.size(); ++i) {
-                figures_.at(i)->SetPen(QColor(QString("#7b6f5d")), 3);
-
-                // Проверяем, если current_figure_ установлен, фильтруем по типу текущей фигуры
-                if (current_figure_ == nullptr || figures_.at(i).get()->GetFigureType() == current_figure_.get()->GetFigureType()) {
-                    if (current_type_count == target_index) {
-                        ui->lineEdit_current_x->setText(QString::number(figures_.at(i)->GetX()));
-                        ui->lineEdit_current_y->setText(QString::number(figures_.at(i)->GetY()));
-                        ui->lineEdit_current_w->setText(QString::number(figures_.at(i)->GetW()));
-                        ui->lineEdit_current_h->setText(QString::number(figures_.at(i)->GetH()));
-                        figures_.at(i)->SetPen(QColor(QString("#e9a000")), 5);
-                        is_found = true;
-                    }
-                    current_type_count++;  // Увеличиваем счетчик для этого типа или общего списка
-                }
-                figures_.at(i)->Show(scene.get());
-            }
-
-            if (!is_found) {
-                QMessageBox::warning(this, "Ошибка", "Фигура с данным индексом не найдена.");
-            }
-        } else {
-            QMessageBox::warning(this, "Ошибка", "Введите корректный индекс.");
-        }
-    } else {
+    // Проверяем, есть ли фигуры в массиве
+    if (figures_.empty()) {
         QMessageBox::critical(this, "Ошибка", "Массив фигур пуст. Добавьте фигуры для поиска.");
+        return;
+    }
+
+    // Получаем индекс из поля ввода
+    QString index_string = ui->lineEdit_index_size->text();
+    if (index_string.isEmpty()) {
+        QMessageBox::warning(this, "Ошибка", "Введите корректный индекс.");
+        return;
+    }
+
+    bool is_found = false;
+    size_t target_index = static_cast<size_t>(index_string.toInt() - 1); // Индексация с 0
+    size_t current_type_count = 0; // Счётчик для индекса конкретного типа
+
+    // Проходим по всем фигурам
+    for (size_t i = 0; i < figures_.size(); ++i) {
+        // Устанавливаем стандартный цвет пера для всех фигур
+        std::visit([this](auto& fig) { fig.SetPen(QColor(QString("#7b6f5d")), 3); }, figures_[i]);
+
+        // Проверяем, соответствует ли фигура выбранному типу (если тип выбран)
+        bool is_type_match = (current_figure_ == FigureType::not_defined_) ||
+                             (std::visit([](auto& fig) { return fig.GetFigureType(); }, figures_[i]) == current_figure_);
+
+        if (is_type_match) {
+            // Если текущий счётчик совпадает с целевым индексом
+            if (current_type_count == target_index) {
+                // Устанавливаем значения в поля ввода
+                std::visit([this](auto& fig) {
+                    ui->lineEdit_current_x->setText(QString::number(fig.GetX()));
+                    ui->lineEdit_current_y->setText(QString::number(fig.GetY()));
+                    ui->lineEdit_current_w->setText(QString::number(fig.GetW()));
+                    ui->lineEdit_current_h->setText(QString::number(fig.GetH()));
+                }, figures_[i]);
+
+                // Устанавливаем выделенный цвет пера
+                std::visit([this](auto& fig) { fig.SetPen(QColor(QString("#e9a000")), 5); }, figures_[i]);
+                is_found = true;
+            }
+            current_type_count++; // Увеличиваем счётчик для этого типа или общего списка
+        }
+
+        // Отображаем фигуру на сцене
+        std::visit([this](auto& fig) { fig.Show(scene.get()); }, figures_[i]);
+    }
+
+    // Если фигура не найдена, выводим сообщение об ошибке
+    if (!is_found) {
+        QMessageBox::warning(this, "Ошибка", "Фигура типа " + ui->comboBox->currentText() +" с номером " + QString::number(target_index + 1) + " не найдена.");
     }
 }
 
@@ -369,160 +347,221 @@ void MainWindow::on_pushButton_random_size_clicked()
     auto [x, y, w, h] = GetCorrectFigure();
     ui->lineEdit_dx->setText(QString::number(x));
     ui->lineEdit_dy->setText(QString::number(y));
-    ui->lineEdit_new_w->setText(QString::number(w));
-    ui->lineEdit_new_h->setText(dynamic_cast<Circle*>(current_figure_.get()) ? QString::number(w) : QString::number(h));
+    // ui->lineEdit_new_w->setText(QString::number(w));
+    // ui->lineEdit_new_h->setText(QString::number(h));
 }
 
-void MainWindow::on_pushButton_ok_size_clicked()
-{
-    if (current_figure_ != nullptr or (current_figure_ == nullptr and !figures_.empty())){
-        if (figures_.empty()) {
-            QMessageBox::critical(this, "Ошибка", "Значение поля «Индекс» не может быть пустым.");
-            return;
-        }
+// void MainWindow::on_pushButton_ok_size_clicked() {
+//     // Проверяем, выбран ли тип фигуры или есть ли фигуры в списке
+//     if (current_figure_ != FigureType::not_defined_ || !figures_.empty()) {
+//         // Если список фигур пуст, выводим ошибку
+//         if (figures_.empty()) {
+//             QMessageBox::critical(this, "Ошибка", "Значение поля «Индекс» не может быть пустым.");
+//             return;
+//         }
 
-        // Проверка заполненности полей размеров
-        bool size_fields_filled = !ui->lineEdit_new_w->text().isEmpty() && !ui->lineEdit_new_h->text().isEmpty();
-        if (!size_fields_filled && (!ui->lineEdit_new_w->text().isEmpty() || !ui->lineEdit_new_h->text().isEmpty())) {
-            QMessageBox::warning(this, "Ошибка", "Для изменения полей Width и Height необходимо указать значение каждого из них.");
-            return;
-        }
+//         // Проверяем, заполнены ли поля для изменения размеров
+//         bool size_fields_filled = !ui->lineEdit_new_w->text().isEmpty() && !ui->lineEdit_new_h->text().isEmpty();
+//         // Проверяем, заполнены ли поля для смещения
+//         bool coord_fields_filled = !ui->lineEdit_dx->text().isEmpty() && !ui->lineEdit_dy->text().isEmpty();
 
-        // Проверка заполненности полей смещения dx и dy
-        bool coord_fields_filled = !ui->lineEdit_dx->text().isEmpty() && !ui->lineEdit_dy->text().isEmpty();
-        if (!coord_fields_filled && (!ui->lineEdit_dx->text().isEmpty() || !ui->lineEdit_dy->text().isEmpty())) {
-            QMessageBox::warning(this, "Ошибка", "Для изменения полей dx и dy необходимо указать значение каждого из них.");
-            return;
-        }
+//         // Считываем значения из полей ввода
+//         int dx = coord_fields_filled ? ui->lineEdit_dx->text().toInt() : 0;
+//         int dy = coord_fields_filled ? ui->lineEdit_dy->text().toInt() : 0;
+//         int new_w = size_fields_filled ? ui->lineEdit_new_w->text().toInt() : std::visit([](auto& fig) { return fig.GetW(); }, figures_.at(0));
+//         int new_h = size_fields_filled ? ui->lineEdit_new_h->text().toInt() : std::visit([](auto& fig) { return fig.GetH(); }, figures_.at(0));
 
-        // Если поля заполнены, считываем их значения
-        int dx = coord_fields_filled ? ui->lineEdit_dx->text().toInt() : 0;
-        int dy = coord_fields_filled ? ui->lineEdit_dy->text().toInt() : 0;
-        int new_w = size_fields_filled ? ui->lineEdit_new_w->text().toInt() : figures_.at(0)->GetW();
-        int new_h = size_fields_filled ? ui->lineEdit_new_h->text().toInt() : figures_.at(0)->GetH();
+//         // Флаг для отслеживания ошибок
+//         bool has_been_mistakes = false;
 
-        // Проверка корректности значений
-        if (size_fields_filled && !SizeIsCorrect(new_w, new_h)) {
-            QMessageBox::warning(this, "Ошибка", "Некорректный ввод полей с координатами или размерами.");
-            return;
-        }
+//         // Получаем индекс фигуры из поля ввода
+//         size_t index = static_cast<size_t>(ui->lineEdit_index_size->text().toInt() - 1);
 
-        bool has_been_mistakes = false;
+//         // Проверяем, что индекс находится в допустимых пределах
+//         if (index < figures_.size()) {
+//             auto& figure = figures_.at(index);
 
-        if (!ui->checkBox_all_size->isChecked()) {
-            bool is_found = false;
-            size_t index = static_cast<size_t>(ui->lineEdit_index_size->text().toInt() - 1);
+//             // Проверяем, можно ли переместить фигуру с новыми параметрами
+//             if (MoveIsCorrect(std::visit([](auto& fig) { return fig.GetX(); }, figure),
+//                               std::visit([](auto& fig) { return fig.GetY(); }, figure),
+//                               new_w, new_h, dx, dy)) {
+//                 // Если поля смещения заполнены, перемещаем фигуру
+//                 if (coord_fields_filled) {
+//                     MoveFigure(figure, dx, dy);
+//                 }
+//                 // Если поля размеров заполнены, изменяем размер фигуры
+//                 if (size_fields_filled) {
+//                     SetFigureSize(figure, new_w, new_h);
+//                 }
+//                 // Отображаем фигуру на сцене
+//                 ShowFigure(figure, scene.get());
+//             } else {
+//                 has_been_mistakes = true;
+//             }
+//         } else {
+//             // Если индекс выходит за пределы, выводим сообщение об ошибке
+//             QMessageBox::warning(this, "Ошибка", "Фигура с номером " + QString::number(index + 1) + " не найдена.");
+//         }
 
-            for (size_t i = 0; i < figures_.size(); ++i) {
-                figures_.at(i)->SetPen(QColor(QString("#7b6f5d")), 3);
+//         // Если были ошибки, выводим предупреждение
+//         if (has_been_mistakes) {
+//             QMessageBox::warning(this, "Ошибка", "Некоторые фигуры с некорректными координатами не были отображены.");
+//         }
+//     } else {
+//         // Если тип фигуры не выбран, выводим ошибку
+//         QMessageBox::critical(this, "Ошибка", "Невозможно выполнить создание. Выберите тип фигуры.");
+//     }
+// }
 
-                // Проверка на совпадение индекса и типа фигуры
-                if (i == index && (current_figure_ == nullptr || figures_.at(i).get()->GetFigureType() == current_figure_.get()->GetFigureType())) {
-                    if (MoveIsCorrect(figures_.at(i).get(), figures_.at(i).get()->GetX(), figures_.at(i).get()->GetY(), new_w, new_h, dx, dy)){
-                        if (coord_fields_filled) {
-                            figures_.at(i)->MoveTo(dx, dy);
-                        }
-                        if (size_fields_filled) {
-                            figures_.at(i)->SetSize(new_w, new_h);
-                        }
-                        ui->lineEdit_current_x->setText(QString::number(figures_.at(i)->GetX()));
-                        ui->lineEdit_current_y->setText(QString::number(figures_.at(i)->GetY()));
-                        ui->lineEdit_current_w->setText(QString::number(figures_.at(i)->GetW()));
-                        ui->lineEdit_current_h->setText(QString::number(figures_.at(i)->GetH()));
-                    }
-                    else {
-                        has_been_mistakes = true;
-                    }
-                    figures_.at(i)->SetPen(QColor(QString("#e9a000")), 5);
-                    is_found = true;
-                }
-                figures_.at(i)->Show(scene.get());
-            }
+void MainWindow::on_pushButton_ok_size_clicked() {
+    // Проверяем, есть ли фигуры в массиве
+    if (figures_.empty()) {
+        QMessageBox::critical(this, "Ошибка", "Список фигур пуст.");
+        return;
+    }
 
-            if (!is_found) {
-                QMessageBox::warning(this, "Ошибка", "Фигура с номером " + QString::number(index + 1) + " не найдена.");
-            }
-        }
-        else {
-            for (size_t i = 0; i < figures_.size(); ++i) {
-                // Проверка на совпадение типа фигуры
-                if (current_figure_ == nullptr || typeid(*figures_.at(i)) == typeid(*current_figure_)) {
+    // Проверяем, заполнены ли поля для изменения размеров
+    bool size_fields_filled = !ui->lineEdit_new_w->text().isEmpty() && !ui->lineEdit_new_h->text().isEmpty();
+    // Проверяем, заполнены ли поля для смещения
+    bool coord_fields_filled = !ui->lineEdit_dx->text().isEmpty() && !ui->lineEdit_dy->text().isEmpty();
 
-                    // Проверяем, будет ли корректна конкретная фигура figures_.at(i),
-                    // если в ней поменять X, Y, Width или Height. Если хоть один будет =false,
-                    // то в конце программы выйдет уведомление, что над некоторыми фигурами не были выполнены операции из за не пройденных тестов на корректность
-                    bool result1 = MoveIsCorrect(figures_.at(i).get(), figures_.at(i)->GetX(), figures_.at(i)->GetY(),
-                                                figures_.at(i)->GetW(), figures_.at(i)->GetH(),
-                                                dx, dy);
-                    bool result2 = MoveIsCorrect(figures_.at(i).get(), figures_.at(i)->GetX(), figures_.at(i)->GetY(), new_w, new_h, dx, dy);
+    // Считываем значения из полей ввода
+    int dx = coord_fields_filled ? ui->lineEdit_dx->text().toInt() : 0;
+    int dy = coord_fields_filled ? ui->lineEdit_dy->text().toInt() : 0;
+    int new_w = size_fields_filled ? ui->lineEdit_new_w->text().toInt() : 0;
+    int new_h = size_fields_filled ? ui->lineEdit_new_h->text().toInt() : 0;
 
-                    if (coord_fields_filled and result1) {
-                        figures_.at(i)->MoveTo(dx, dy);
-                        figures_.at(i)->Show(scene.get());
-                    }
-                    if (size_fields_filled and result2) {
-                        figures_.at(i)->SetSize(new_w, new_h);
-                        figures_.at(i)->Show(scene.get());
-                    }
-                    if (!result1 || !result2){
-                        continue;
-                    }
+    // Проверяем, выбран ли чек-бокс "Все"
+    bool is_all_figures_selected = ui->checkBox_all_size->isChecked();
+
+    if (is_all_figures_selected) {
+        // Обрабатываем все фигуры
+        for (auto& figure : figures_) {
+            // Если выбрано "Не выбрано", обрабатываем все фигуры
+            // Иначе обрабатываем только фигуры выбранного типа
+            if (current_figure_ == FigureType::not_defined_ ||
+                std::visit([](auto& fig) { return fig.GetFigureType(); }, figure) == current_figure_) {
+                if (ApplyChangesToFigure(figure, dx, dy, new_w, new_h, size_fields_filled, coord_fields_filled)) {
+                    ShowFigure(figure, scene.get());
                 }
             }
         }
-
-        if (has_been_mistakes) {
-            QMessageBox::warning(this, "Ошибка", "Некоторые фигуры с некорректными координатами не были отображены.");
+    } else {
+        // Обрабатываем только одну фигуру по индексу
+        QString index_string = ui->lineEdit_index_size->text();
+        if (index_string.isEmpty()) {
+            QMessageBox::warning(this, "Ошибка", "Введите корректный индекс.");
+            return;
         }
-    }
-    else {
-        QMessageBox::critical(this, "Ошибка", "Невозможно выполнить создание. Выберите тип фигуры.");
+
+        size_t index = static_cast<size_t>(index_string.toInt() - 1);
+        if (index < figures_.size()) {
+            auto& figure = figures_.at(index);
+
+            // Если выбрано "Не выбрано", обрабатываем фигуру независимо от типа
+            // Иначе проверяем, что тип фигуры совпадает с выбранным
+            if (current_figure_ == FigureType::not_defined_ ||
+                std::visit([](auto& fig) { return fig.GetFigureType(); }, figure) == current_figure_) {
+                if (ApplyChangesToFigure(figure, dx, dy, new_w, new_h, size_fields_filled, coord_fields_filled)) {
+                    ShowFigure(figure, scene.get());
+                }
+            } else {
+                QMessageBox::warning(this, "Ошибка", "Фигура типа " + ui->comboBox->currentText() + " с номером " + QString::number(index + 1) + " не соответствует выбранному типу.");
+            }
+        } else {
+            QMessageBox::warning(this, "Ошибка", "Фигура типа " + ui->comboBox->currentText() + " с номером " + QString::number(index + 1) + " не найдена.");
+        }
     }
 }
 
-void MainWindow::on_checkBox_all_size_stateChanged(int arg1)
-{
+bool MainWindow::ApplyChangesToFigure(FigureVariant& figure, int dx, int dy, int new_w, int new_h, bool size_fields_filled, bool coord_fields_filled) {
+    // Получаем текущие координаты и размеры фигуры
+    int x = std::visit([](auto& fig) { return fig.GetX(); }, figure);
+    int y = std::visit([](auto& fig) { return fig.GetY(); }, figure);
+    int w = std::visit([](auto& fig) { return fig.GetW(); }, figure);
+    int h = std::visit([](auto& fig) { return fig.GetH(); }, figure);
+
+    // Если размеры не указаны, используем текущие размеры фигуры
+    if (!size_fields_filled) {
+        new_w = w;
+        new_h = h;
+    }
+
+    // Проверяем, можно ли переместить фигуру с новыми параметрами
+    if (MoveIsCorrect(x, y, new_w, new_h, dx, dy)) {
+        // Если поля смещения заполнены, перемещаем фигуру
+        if (coord_fields_filled) {
+            MoveFigure(figure, dx, dy);
+        }
+        // Если поля размеров заполнены, изменяем размер фигуры
+        if (size_fields_filled) {
+            SetFigureSize(figure, new_w, new_h);
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void MainWindow::on_checkBox_all_size_stateChanged(int arg1) {
     bool is_found = false;
+
     switch (arg1) {
     case Qt::Checked:
-        for (size_t i = 0; i < figures_.size(); ++i) {
-            auto figure = figures_.at(i).get();
+        for (auto& figure : figures_) {
+            std::visit([this, &is_found](auto& fig) {
+                // Если current_figure_ равен not_defined_, выделяем все фигуры
+                if (current_figure_ == FigureType::not_defined_) {
+                    fig.SetPen(QColor(QString("#e9a000")), 5); // Выделяем цветом
+                    is_found = true;
+                }
+                // Иначе выделяем только те фигуры, которые соответствуют типу current_figure_
+                else if (fig.GetFigureType() == current_figure_) {
+                    fig.SetPen(QColor(QString("#e9a000")), 5); // Выделяем цветом
+                    is_found = true;
+                }
 
-            // Если current_figure_ равен nullptr, выделяем все фигуры
-            if (current_figure_ == nullptr) {
-                figure->SetPen(QColor(QString("#e9a000")), 5);
-                is_found = true;
-            }
-            // Иначе выделяем только те фигуры, которые соответствуют типу current_figure_
-            else if (typeid(*figure) == typeid(*current_figure_)) {
-                figure->SetPen(QColor(QString("#e9a000")), 5);
-                is_found = true;
-            }
-
-            figure->Show(scene.get());
+                fig.Show(scene.get()); // Обновляем отображение фигуры на сцене
+            }, figure);
         }
-        // Если выбран чек-бокс «Все», значит запрещаем осуществлять ввод индекса конкретной фигуры
-        // до тех пор, пока чек-бокс не перейдёт в состояние Qt::Unchecked
-        ui->lineEdit_index_size->setReadOnly(true);
-        ClearLineEdit();
 
-        if (!is_found){
+        // Если ни одна фигура не была выделена, показываем предупреждение
+        if (!is_found) {
             QMessageBox::warning(this, "Фигуры не выделены", "Проверьте схождение выбранного типа фигуры с тем типом, что в данный момент находится на холсте.");
-            ui->checkBox_all_size->setCheckState(Qt::Unchecked);
+            ui->checkBox_all_size->setCheckState(Qt::Unchecked); // Сбрасываем флажок
+        } else {
+            // Если выбран чек-бокс «Все», запрещаем ввод индекса конкретной фигуры
+            ui->lineEdit_index_size->setReadOnly(true);
+            ClearLineEdit(); // Очищаем поля ввода
         }
-
         break;
 
     case Qt::Unchecked:
         // Сбрасываем стиль для всех фигур
-        for (size_t i = 0; i < figures_.size(); ++i) {
-            figures_.at(i)->SetPen(QColor(QString("#7b6f5d")), 3);
-            figures_.at(i)->Show(scene.get());
+        for (auto& figure : figures_) {
+            std::visit([this](auto& fig) {
+                fig.SetPen(QColor(QString("#7b6f5d")), 3); // Возвращаем стандартный цвет
+                fig.Show(scene.get()); // Обновляем отображение фигуры на сцене
+            }, figure);
         }
-        // Снова разрешаем ввод в индекс фигуры для поиска, так как работа идёт не над всеми фигурами в массиве,
-        // а над конкретной
+
+        // Снова разрешаем ввод индекса фигуры для поиска
         ui->lineEdit_index_size->setReadOnly(false);
         break;
     }
 }
 
+QVector<int> ParseIndices(const QString& input) {
+    QVector<int> indices;
+    QStringList parts = input.split(",");
+
+    for (const QString& part : parts) {
+        bool ok;
+        int index = part.toInt(&ok);
+        if (ok) {
+            indices.append(index);
+        }
+    }
+
+    return indices;
+}

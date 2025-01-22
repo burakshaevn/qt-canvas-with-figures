@@ -2,16 +2,16 @@
 
 Rectangle::Rectangle() = default;
 
-Rectangle::Rectangle(int x, int y, int w, int h, const QPen& pen, const FigureType& figure_type)
-    : Figure(x, y, w, h, pen, 3, figure_type)
-{
-    rect_item_ = new QGraphicsRectItem(0, 0, w, h);
-    rect_item_->setPen(pen);
-}
+Rectangle::Rectangle(int x, int y, int w, int h, const QPen& pen)
+    : x_(x)
+    , y_(y)
+    , w_(w)
+    , h_(h)
+    , pen_(pen)
+    , rect_item_(nullptr)
+{}
 
-Rectangle::~Rectangle() = default;
-
-void Rectangle::MoveTo(const int dx, const int dy) {
+void Rectangle::MoveTo(int dx, int dy) {
     x_ += dx;
     y_ += dy;
     if (rect_item_) {
@@ -19,7 +19,7 @@ void Rectangle::MoveTo(const int dx, const int dy) {
     }
 }
 
-void Rectangle::SetSize(const int w, const int h) {
+void Rectangle::SetSize(int w, int h) {
     w_ = w;
     h_ = h;
     if (rect_item_) {
@@ -27,7 +27,7 @@ void Rectangle::SetSize(const int w, const int h) {
     }
 }
 
-void Rectangle::Show(QGraphicsScene *scene) {
+void Rectangle::Show(QGraphicsScene* scene) {
     if (!rect_item_) {
         rect_item_ = new QGraphicsRectItem(0, 0, w_, h_);
     }
@@ -36,7 +36,6 @@ void Rectangle::Show(QGraphicsScene *scene) {
     }
     rect_item_->setPos(x_, y_);
     rect_item_->setPen(pen_);
-    rect_item_->setVisible(is_visible_);
 }
 
 void Rectangle::RemoveFromScene(QGraphicsScene* scene) {
@@ -45,4 +44,25 @@ void Rectangle::RemoveFromScene(QGraphicsScene* scene) {
         delete rect_item_;
         rect_item_ = nullptr;
     }
+}
+
+int Rectangle::GetX() const {
+    return x_;
+}
+int Rectangle::GetY() const {
+    return y_;
+}
+int Rectangle::GetW() const {
+    return w_;
+}
+int Rectangle::GetH() const {
+    return h_;
+}
+
+void Rectangle::SetPen(const QPen& pen, const int pen_width) {
+    pen_ = pen;
+    pen_.setWidth(pen_width);
+}
+FigureType Rectangle::GetFigureType() const {
+    return FigureType::rectangle_;
 }

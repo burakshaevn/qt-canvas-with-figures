@@ -100,7 +100,7 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>95</x>
+        <x>92</x>
         <y>15</y>
         <width>83</width>
         <height>20</height>
@@ -162,7 +162,7 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>28</x>
+        <x>74</x>
         <y>41</y>
         <width>118</width>
         <height>31</height>
@@ -182,7 +182,7 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>427</x>
+        <x>473</x>
         <y>41</y>
         <width>69</width>
         <height>31</height>
@@ -199,92 +199,10 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="label_9">
-      <property name="geometry">
-       <rect>
-        <x>550</x>
-        <y>41</y>
-        <width>82</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QLabel { 
-	background-color: rgb(255, 255, 255);
-	border: 0px solid;
-    border-radius: 8px; 
-}</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_eye">
-      <property name="geometry">
-       <rect>
-        <x>154</x>
-        <y>41</y>
-        <width>38</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton { 
-	background-color: rgb(255, 255, 255);
-	border: 0px solid;
-    border-radius: 8px; 
-}
-
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="resources/resources_file.qrc">
-        <normaloff>:/Eye off.png</normaloff>:/Eye off.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>23</width>
-        <height>23</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_trash">
-      <property name="geometry">
-       <rect>
-        <x>199</x>
-        <y>41</y>
-        <width>38</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton { 
-	background-color: rgb(255, 255, 255);
-	border: 0px solid;
-    border-radius: 8px; 
-}</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="resources/resources_file.qrc">
-        <normaloff>:/Trash.png</normaloff>:/Trash.png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>23</width>
-        <height>23</height>
-       </size>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_13">
       <property name="geometry">
        <rect>
-        <x>43</x>
+        <x>89</x>
         <y>46</y>
         <width>63</width>
         <height>20</height>
@@ -306,7 +224,7 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
      <widget class="QLabel" name="label_14">
       <property name="geometry">
        <rect>
-        <x>436</x>
+        <x>482</x>
         <y>46</y>
         <width>19</width>
         <height>20</height>
@@ -323,25 +241,6 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_all_size">
-      <property name="geometry">
-       <rect>
-        <x>564</x>
-        <y>43</y>
-        <width>55</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QCheckBox {
-	color: rgb(54, 54, 54);
-	font: 500 12pt &quot;JetBrains Mono&quot;;
-}</string>
-      </property>
-      <property name="text">
-       <string>Все</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_16">
@@ -391,7 +290,7 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
      <widget class="QLineEdit" name="lineEdit_count">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>156</x>
         <y>46</y>
         <width>31</width>
         <height>21</height>
@@ -413,7 +312,7 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
      <widget class="QLineEdit" name="lineEdit_index_size">
       <property name="geometry">
        <rect>
-        <x>459</x>
+        <x>505</x>
         <y>46</y>
         <width>31</width>
         <height>21</height>
@@ -872,7 +771,7 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
      <widget class="QPushButton" name="pushButton_search_size">
       <property name="geometry">
        <rect>
-        <x>503</x>
+        <x>549</x>
         <y>41</y>
         <width>38</width>
         <height>31</height>
@@ -1075,6 +974,25 @@ QComboBox::down-arrow { image: none; border-width: 0px; };</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_all_size">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>43</y>
+        <width>55</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox {
+	color: rgb(54, 54, 54);
+	font: 500 12pt JetBrains Mono;
+}</string>
+      </property>
+      <property name="text">
+       <string>ВСЕ</string>
       </property>
      </widget>
     </widget>
