@@ -3,24 +3,23 @@
 Line::Line() = default;
 
 Line::Line(int x1, int y1, int x2, int y2, const QPen& pen)
-    // : Figure(x1, y1, x2 - x1, y2 - y1, pen, 3, FigureType::line_)
     : x_(x1)
     , y_(y1)
-    , x2_(x2 - x1)
-    , y2_(y2 - y1)
+    , x2_(x2)
+    , y2_(y2)
+    , w_(x2 - x1)
+    , h_(y2 - y1)
 {
     line_item_ = new QGraphicsLineItem(x1, y1, x2, y2);
     line_item_->setPen(pen);
 }
 
 void Line::MoveTo(const int dx, const int dy) {
-    // Смещаем начало и конец линии
     x_ += dx;
     y_ += dy;
     x2_ += dx;
     y2_ += dy;
 
-    // Обновляем позицию линии на сцене, если line_item_ не равен nullptr
     if (line_item_) {
         line_item_->setLine(x_, y_, x2_, y2_);
     }
@@ -32,11 +31,11 @@ void Line::SetCoords(const int x, const int y){
 }
 
 void Line::SetSize(const int w, const int h) {
-    // Изменяем конечные координаты линии в зависимости от новых ширины и высоты
     x2_ = x_ + w;
     y2_ = y_ + h;
+    w_ = w;
+    h_ = h;
 
-    // Обновляем позицию линии на сцене
     if (line_item_) {
         line_item_->setLine(x_, y_, x2_, y2_);
     }

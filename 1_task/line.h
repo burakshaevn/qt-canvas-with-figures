@@ -43,7 +43,7 @@ private:
     int w_ = 0;
     int h_ = 0;
     bool is_visible_ = true;
-    QPen pen_ = QPen(QColor("#7b6f5d"));
+    QPen pen_ = QPen(QColor("#7b6f5d"), 3);
     QGraphicsLineItem* line_item_;
 };
 

@@ -100,34 +100,6 @@ bool MainWindow::SizeIsCorrect(const int w, const int h) const {
            w <= ui->graphicsView->width() &&
            h <= ui->graphicsView->height();
 }
-// bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int h, const int dx, const int dy) const {
-//     if (current_figure_ == FigureType::ellipse_) {
-//         return (x + dx) >= 0 && (y + dy) >= 0 &&
-//                ((x + w) + dx) <= scene->width() &&
-//                ((y + h) + dy) <= scene->height();
-//     }
-//     else if (current_figure_ == FigureType::rectangle_) {
-//         return (x + dx) >= 0 && (y + dy) >= 0 &&
-//                ((x + w) + dx) <= scene->width() &&
-//                ((y + h) + dy) <= scene->height();
-//     }
-//     else if (current_figure_ == FigureType::square_) {
-//         return (x + dx) >= 0 && (y + dy) >= 0 &&
-//                ((x + w) + dx) <= scene->width() &&
-//                ((y + w) + dy) <= scene->height();
-//     }
-//     else if (current_figure_ == FigureType::line_) {
-//         int x1_new = x + dx;
-//         int y1_new = y + dy;
-//         int x2_new = x + w + dx;
-//         int y2_new = y + h + dy;
-//         return x1_new >= 0 && x1_new <= scene->width() &&
-//                y1_new >= 0 && y1_new <= scene->height() &&
-//                x2_new >= 0 && x2_new <= scene->width() &&
-//                y2_new >= 0 && y2_new <= scene->height();
-//     }
-//     return false; // если тип фигуры неизвестен
-// }
 
 bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int h, const int dx, const int dy) const {
     // Новые координаты после перемещения
@@ -227,7 +199,7 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
 
 void MainWindow::on_pushButton_random_create_clicked() {
     auto [x, y, w, h] = GetCorrectFigure();
-    ui->lineEdit_count->setText(QString::number(GetRandomNumber(2, 20)));
+    // ui->lineEdit_count->setText(QString::number(GetRandomNumber(2, 20)));
     ui->lineEdit_x->setText(QString::number(x));
     ui->lineEdit_y->setText(QString::number(y));
     ui->lineEdit_w->setText(QString::number(w));
@@ -250,18 +222,10 @@ void MainWindow::on_pushButton_ok_create_clicked() {
 
         bool has_been_mistakes = false;
         for (size_t i = 0; i < count; ++i) {
-            if (count == 1) {
-                x = ui->lineEdit_x->text().toInt();
-                y = ui->lineEdit_y->text().toInt();
-                w = ui->lineEdit_w->text().toInt();
-                h = ui->lineEdit_h->text().toInt();
-            } else {
-                auto [x_, y_, w_, h_] = GetCorrectFigure();
-                x = x_;
-                y = y_;
-                w = w_;
-                h = h_;
-            }
+            x = ui->lineEdit_x->text().toInt();
+            y = ui->lineEdit_y->text().toInt();
+            w = ui->lineEdit_w->text().toInt();
+            h = ui->lineEdit_h->text().toInt();
 
             try {
                 FigureVariant new_figure = CreateFigure(current_figure_, x, y, w, h);
@@ -347,71 +311,7 @@ void MainWindow::on_pushButton_random_size_clicked()
     auto [x, y, w, h] = GetCorrectFigure();
     ui->lineEdit_dx->setText(QString::number(x));
     ui->lineEdit_dy->setText(QString::number(y));
-    // ui->lineEdit_new_w->setText(QString::number(w));
-    // ui->lineEdit_new_h->setText(QString::number(h));
 }
-
-// void MainWindow::on_pushButton_ok_size_clicked() {
-//     // Проверяем, выбран ли тип фигуры или есть ли фигуры в списке
-//     if (current_figure_ != FigureType::not_defined_ || !figures_.empty()) {
-//         // Если список фигур пуст, выводим ошибку
-//         if (figures_.empty()) {
-//             QMessageBox::critical(this, "Ошибка", "Значение поля «Индекс» не может быть пустым.");
-//             return;
-//         }
-
-//         // Проверяем, заполнены ли поля для изменения размеров
-//         bool size_fields_filled = !ui->lineEdit_new_w->text().isEmpty() && !ui->lineEdit_new_h->text().isEmpty();
-//         // Проверяем, заполнены ли поля для смещения
-//         bool coord_fields_filled = !ui->lineEdit_dx->text().isEmpty() && !ui->lineEdit_dy->text().isEmpty();
-
-//         // Считываем значения из полей ввода
-//         int dx = coord_fields_filled ? ui->lineEdit_dx->text().toInt() : 0;
-//         int dy = coord_fields_filled ? ui->lineEdit_dy->text().toInt() : 0;
-//         int new_w = size_fields_filled ? ui->lineEdit_new_w->text().toInt() : std::visit([](auto& fig) { return fig.GetW(); }, figures_.at(0));
-//         int new_h = size_fields_filled ? ui->lineEdit_new_h->text().toInt() : std::visit([](auto& fig) { return fig.GetH(); }, figures_.at(0));
-
-//         // Флаг для отслеживания ошибок
-//         bool has_been_mistakes = false;
-
-//         // Получаем индекс фигуры из поля ввода
-//         size_t index = static_cast<size_t>(ui->lineEdit_index_size->text().toInt() - 1);
-
-//         // Проверяем, что индекс находится в допустимых пределах
-//         if (index < figures_.size()) {
-//             auto& figure = figures_.at(index);
-
-//             // Проверяем, можно ли переместить фигуру с новыми параметрами
-//             if (MoveIsCorrect(std::visit([](auto& fig) { return fig.GetX(); }, figure),
-//                               std::visit([](auto& fig) { return fig.GetY(); }, figure),
-//                               new_w, new_h, dx, dy)) {
-//                 // Если поля смещения заполнены, перемещаем фигуру
-//                 if (coord_fields_filled) {
-//                     MoveFigure(figure, dx, dy);
-//                 }
-//                 // Если поля размеров заполнены, изменяем размер фигуры
-//                 if (size_fields_filled) {
-//                     SetFigureSize(figure, new_w, new_h);
-//                 }
-//                 // Отображаем фигуру на сцене
-//                 ShowFigure(figure, scene.get());
-//             } else {
-//                 has_been_mistakes = true;
-//             }
-//         } else {
-//             // Если индекс выходит за пределы, выводим сообщение об ошибке
-//             QMessageBox::warning(this, "Ошибка", "Фигура с номером " + QString::number(index + 1) + " не найдена.");
-//         }
-
-//         // Если были ошибки, выводим предупреждение
-//         if (has_been_mistakes) {
-//             QMessageBox::warning(this, "Ошибка", "Некоторые фигуры с некорректными координатами не были отображены.");
-//         }
-//     } else {
-//         // Если тип фигуры не выбран, выводим ошибку
-//         QMessageBox::critical(this, "Ошибка", "Невозможно выполнить создание. Выберите тип фигуры.");
-//     }
-// }
 
 void MainWindow::on_pushButton_ok_size_clicked() {
     // Проверяем, есть ли фигуры в массиве
