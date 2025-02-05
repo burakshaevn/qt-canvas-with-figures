@@ -6,6 +6,7 @@
 #include <QPen>
 
 #include "domain.h"
+#include "point.h"
 
 class Rectangle {
 public:
@@ -28,12 +29,11 @@ public:
     FigureType GetFigureType() const;
 
 private:
-    int x_;
-    int y_;
-    int w_;
-    int h_;
-    QPen pen_;
-    QGraphicsRectItem* rect_item_;
+    Point position_; // Позиция прямоугольника
+    int w_;          // Ширина
+    int h_;          // Высота
+    QPen pen_;       // Перо для отрисовки
+    QGraphicsRectItem* rect_item_; // Графический элемент
 };
 
 #endif // RECTANGLE_H

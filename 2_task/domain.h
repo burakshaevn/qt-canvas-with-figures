@@ -6,7 +6,8 @@ enum class FigureType{
     ellipse_,
     rectangle_,
     square_,
-    line_
+    line_,
+    ring_
 };
 
 #endif // DOMAIN_H

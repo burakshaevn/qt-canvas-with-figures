@@ -7,6 +7,7 @@
 #include "rectangle.h"
 #include "square.h"
 #include "line.h"
+#include "ring.h"
 #include "domain.h"
 
 #include <random>
@@ -28,7 +29,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    using FigureVariant = std::variant<Rectangle, Square, Ellipse, Line>;
+    using FigureVariant = std::variant<Rectangle, Square, Ellipse, Line, Ring>;
 
 private slots:
     void on_comboBox_currentIndexChanged(int index);

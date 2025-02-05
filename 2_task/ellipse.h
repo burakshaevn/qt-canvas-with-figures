@@ -6,6 +6,7 @@
 #include <QPen>
 
 #include "domain.h"
+#include "point.h"
 
 enum class FigureType;
 
@@ -22,6 +23,12 @@ public:
     void Show(QGraphicsScene *scene);
     void RemoveFromScene(QGraphicsScene* scene);
 
+    // Методы для обновления координат и размеров
+    void SetX(const int);
+    void SetY(const int);
+    void SetW(const int);
+    void SetH(const int);
+
     // Методы для получения координат и размеров
     int GetX() const;
     int GetY() const;
@@ -35,8 +42,7 @@ private:
     int radius_1_;
     int radius_2_;
 
-    int x_ = 0;
-    int y_ = 0;
+    Point position_;
     bool is_visible_ = true;
     QPen pen_ = QPen(QColor("#7b6f5d"), 3);
 
