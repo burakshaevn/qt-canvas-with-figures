@@ -355,18 +355,23 @@ void MainWindow::on_pushButton_ok_size_clicked() {
         }
 
         size_t index = static_cast<size_t>(index_string.toInt() - 1);
-        if (index < figures_.size()) {
-            auto& figure = figures_.at(index);
 
-            // Если выбрано "Не выбрано", обрабатываем фигуру независимо от типа
-            // Иначе проверяем, что тип фигуры совпадает с выбранным
+        // Фильтруем фигуры по типу, если тип выбран
+        std::vector<size_t> filtered_indices;
+        for (size_t i = 0; i < figures_.size(); ++i) {
             if (current_figure_ == FigureType::not_defined_ ||
-                std::visit([](auto& fig) { return fig.GetFigureType(); }, figure) == current_figure_) {
-                if (ApplyChangesToFigure(figure, dx, dy, new_w, new_h, size_fields_filled, coord_fields_filled)) {
-                    ShowFigure(figure, scene.get());
-                }
-            } else {
-                QMessageBox::warning(this, "Ошибка", "Фигура типа " + ui->comboBox->currentText() + " с номером " + QString::number(index + 1) + " не соответствует выбранному типу.");
+                std::visit([](auto& fig) { return fig.GetFigureType(); }, figures_[i]) == current_figure_) {
+                filtered_indices.push_back(i);
+            }
+        }
+
+        // Проверяем, что индекс находится в пределах отфильтрованного списка
+        if (index < filtered_indices.size()) {
+            size_t actual_index = filtered_indices[index];
+            auto& figure = figures_.at(actual_index);
+
+            if (ApplyChangesToFigure(figure, dx, dy, new_w, new_h, size_fields_filled, coord_fields_filled)) {
+                ShowFigure(figure, scene.get());
             }
         } else {
             QMessageBox::warning(this, "Ошибка", "Фигура типа " + ui->comboBox->currentText() + " с номером " + QString::number(index + 1) + " не найдена.");
@@ -392,10 +397,14 @@ bool MainWindow::ApplyChangesToFigure(FigureVariant& figure, int dx, int dy, int
         // Если поля смещения заполнены, перемещаем фигуру
         if (coord_fields_filled) {
             MoveFigure(figure, dx, dy);
+            ui->lineEdit_current_x->setText(QString::number(x + dx));
+            ui->lineEdit_current_y->setText(QString::number(y + dy));
         }
         // Если поля размеров заполнены, изменяем размер фигуры
         if (size_fields_filled) {
             SetFigureSize(figure, new_w, new_h);
+            ui->lineEdit_current_w->setText(QString::number(new_w));
+            ui->lineEdit_current_h->setText(QString::number(new_h));
         }
         return true;
     } else {
