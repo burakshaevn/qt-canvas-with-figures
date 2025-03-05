@@ -1,276 +1,238 @@
-# Создание графических примитивов
+# Реализация взаимодействия классов на основе агрегации
 
-### 1.  Разместить на форме компонент Image для отображения примитивов и выровнять его на всю клиентскую область
+Задачи, которые необходимо реализовать в л/р:
 
-У нас роль «холста будет принимать приватный атрибут, который хранится в классе MainWindow: `std::unique_ptr<QGraphicsScene> scene;`. Заметим, что это не обычный сырой указатель, а умный указатель «std::unique_ptr», который сам следит за временем жизни объекта, для которого выделялась динамически память, и удаляет объект, как только он перестаёт использоваться. То есть, нам не нужно собственноручно писать деструктор для этого объекта (`scene`):
-
-```cpp
-class MainWindow : public QMainWindow
-{
-   // Какие-то прочие методы ...
-private:
-   std::unique_ptr<QGraphicsScene> scene;
-   // Какие-то прочие приватные атрибуты
-};
-```
-
-Он у нас инициализируется в конструкторе класса MainWindow. Задаём расположение x: 0, y: 0, width: 1260, height: 557.
-```cpp
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-    , scene(nullptr)
-{
-    // Создаем сцену с фиксированными размерами
-    scene = std::make_unique<QGraphicsScene>(0, 0, 1260, 557, this);
-    ui->graphicsView->setScene(scene.get());
-
-    // ...
-}
-```
-
-### 2.  Создать обработчик события формы OnCreate для инициализации датчика псевдослучайных чисел и установки режима рисования на поверхности компонента Image.
-В классе MainWindow есть функция GetRandomNumber:
-```cpp
-int MainWindow::GetRandomNumber(const int min, const int max) const {
-   static std::mt19937 engine{ std::random_device{}() };
-   std::uniform_int_distribution<int> distribution(min, max);
-   return distribution(engine);
-}
-```
-Этот код использует библиотеку `<random>` для создания генератора случайных чисел.
-
-### 5.  Добавить в проект новый программный модуль, НЕ СВЯЗАННЫЙ со своей формой: команда меню File / New / Unit   и  ОБЯЗАТЕЛЬНО СОХРАНИТЬ ЕГО ВМЕСТЕ С ПРОЕКТОМ. Поскольку модуль является чисто программным, то его заготовка содержит лишь заголовок, начало интерфейсной секции (директива interface) и начало секции реализации (директива implementation).
-
-В контексте C++ и Qt это означает, что нам нужно создать новый заголовочный файл (.h) и файл реализации (.cpp), которые будут содержать код, не связанный с графическим интерфейсом. То есть, создать отдельные файлы (.h) и (.cpp) для классов фигур. У нас все заголовочные файлы (.h) отделены от файлов реализации (.cpp):
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/86486d0c-0da8-45e9-9d30-6b72b9bd7d05" alt="image">
-   <img src="https://github.com/user-attachments/assets/84faa424-5bb0-4edc-a372-9410c63af20d" alt="image">
-</div> 
- 
-### 7.  В интерфейсном разделе нового модуля ввести описание (ТОЛЬКО ОПИСАНИЕ!) одного из создаваемых классов (в разделе описания типов). Для простоты сначала можно взять класс окружностей, подробно описанный в лекционном материале. Остальные классы можно добавить после проверки работы класса окружностей. В классе сделать поля данных закрытыми, а методы – открытыми. Каждый примитив должен иметь базовую точку, изменение координат которой приводит к перемещению примитива без изменения его размеров.
-
-Здесь имеется в виду что в заголочных файлах у нас должно быть только объявление интерфейса (функций), а реализация должна быть в (.cpp) файлах. Пример ellipse.h:
-```cpp
-#ifndef ELLIPSE_H
-#define ELLIPSE_H
-
-#include <QGraphicsScene>
-#include <QGraphicsEllipseItem>
-#include <QPen>
-
-#include "domain.h"
-
-enum class FigureType;
-
-class Ellipse {
-public:
-    Ellipse();
-    Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
-
-    // Реализовывать деструктор здесь не нужно, потому что здесь нет динамического выделения памяти
-    // ~Ellipse();
-
-    void MoveTo(int dx, int dy);
-    void SetSize(const int w, const int h);
-    void Show(QGraphicsScene *scene);
-    void RemoveFromScene(QGraphicsScene* scene);
-
-    // Методы для получения координат и размеров
-    int GetX() const;
-    int GetY() const;
-    int GetW() const; // Ширина = диаметр по горизонтали
-    int GetH() const; // Высота = диаметр по вертикали
-
-    void SetPen(const QPen& pen, const int pen_width);
-    FigureType GetFigureType() const;
-
-private:
-    int radius_1_;
-    int radius_2_;
-
-    int x_ = 0;
-    int y_ = 0;
-    bool is_visible_ = true;
-    QPen pen_ = QPen(QColor("#7b6f5d"));
-
-    QGraphicsEllipseItem* ellipse_item_;
-};
-
-#endif // ELLIPSE_H
-```
-   
-### 9.  Оформить раздел реализации модуля, включив в него программную реализацию каждого объявленного метода. В методе MoveTo для удобства дальнейшего использования задаются не новые координаты базовой точки, а СМЕЩЕНИЕ относительно нее, которое может быть и отрицательным.
-
-То есть имеют в виду что нужно реализовать каждый метод в (.cpp) файлах, что мы объявили в (.h) файлах. Написать саму логику для этих функций. И при этом, MoveTo должен не телепортировать объект на координаты, а добавлять к текущим X и Y указанные пользователем координаты.
-
-Здесь в качесте примера реализации этого метода можно показать функцию MoveTo.
-
-```cpp
-void Ellipse::MoveTo(int dx, int dy) {
-   // добавляем к текущим координатам (x_ и y_) новые значения, то есть, х и у
-    x_ += dx;
-    y_ += dy;
-   // Проверяем, инициализирован ли ellipse_item_. Если да, то перемещаем объект.
-    if (ellipse_item_) {
-        ellipse_item_->setPos(x_ - radius_1_, y_ - radius_2_);
+1.  **Добавить новый класс для примитивов-точек, содержащий:** 
+Теперь у нас есть класс Point. Его объявление и реализация хранятся в point.h, исполняемого файла point.cpp у него нет.
+	 <div align="center">
+	  <img src="https://github.com/user-attachments/assets/0a827b5e-042a-4774-bc55-fa1df73a60e1" alt="image" width="70%"> 
+	</div> 
+ * два свойства для хранения координат точки;
+	 ```cpp
+	 private:
+	    int x_;
+	    int y_;
+	```
+ * конструктор для инициализации свойств-координат и вывода сообщения о создании объекта (это будет использоваться в дальнейшем при проверке правильности вложенных вызовов конструкторов взаимодействующих классов);
+	 ```cpp
+	 Point(const int x = 0, const int y = 0)
+        : x_(x)
+        , y_(y)
+    {
+        qDebug() << "Создана точка: X=" << x << ", Y=" << y;
     }
-}
-```
+	```
+ * Set/Get-методы для доступа к координатам точки.
+	 ```cpp
+	inline int GetX() const {
+		return x_;
+	}
+	inline int GetY() const {
+		return y_;
+	}
 
-### 11.  Программная реализация методов показа примитивов может использовать стандартные графические примитивы системы Windows. Например, вывод окружности выполняется следующим образом:
-`Form1.Image1.Canvas.Ellipse(x-r, y-r, x+r, y+r);`
+	inline void SetX(int x) {
+		x_ = x;
+	}
+	inline void SetY(int y) {
+		y_ = y;
+	}
+	```
 
-У нас не Delphi Pascal, а C++, поэтому, у нас объект окружности реализует `QGraphicsEllipseItem* ellipse_item_`. В каждом классе есть свой такой объект. Например, в классе прямоугольник это `QGraphicsRectItem* rect_item_`.
- 
-### 13.   В разделе реализации основного модуля объявить одну-две переменные объектного типа, а также – массив объектных указателей для проверки возможностей групповой обработки объектов-примитивов.
+2. **Внести следующие изменения в ранее созданный класс *Окружность*:**
 
-* Тип FigureVariant
+* заменить свойства-координаты одним свойством-точкой;
+	Это значит, что теперь в классе Ellipse за координаты у нас отвечает не две переменные: `int x_` и `int y_`, а всего одна — `Point position_`.
+* реализовать два конструктора, которые, кроме стандартных операций, выполняют дополнительно:
+	1. проверку значения радиуса и при необходимости - изменение его так, чтобы окружность не выходила за пределы области рисования;
+		Проверка происходит в функции MoveIsCorrect класса MainWindow. Для всех фигур проверка одинаковая, кроме если тип фигуры — линия. Для неё проверка будет другой (см. в коде).
+		```cpp
+		bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int h, const int dx, const int dy) const {
+			// Новые координаты после перемещения
+			int new_x = x + dx;
+			int new_y = y + dy;
+		
+			// Проверяем, что новые координаты не выходят за пределы сцены
+			bool is_x_valid = new_x >= 0 && (new_x + w) <= scene->width();
+			bool is_y_valid = new_y >= 0 && (new_y + h) <= scene->height();
+		
+			// Для линии проверяем обе точки
+			if (current_figure_ == FigureType::line_) {
+				int x1_new = new_x;
+				int y1_new = new_y;
+				int x2_new = new_x + w;
+				int y2_new = new_y + h;
+		
+				is_x_valid = x1_new >= 0 && x1_new <= scene->width() &&
+							 x2_new >= 0 && x2_new <= scene->width();
+				is_y_valid = y1_new >= 0 && y1_new <= scene->height() &&
+							 y2_new >= 0 && y2_new <= scene->height();
+			}
+		
+			return is_x_valid && is_y_valid;
+		}
+		```
+	2. вывод сообщения о создании объекта-окружности;
+		Этот вывод происходит в конструкторе класса Ellipse с помощью команды qDebug() — она выводит текст на экран точно также как и cout в С++, но так как мы делаем всё это с помощью фреймворка Qt, за поток вывода у нас отвечает другая команда.
+		```cpp
+		Ellipse::Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen)
+		    : position_(x, y)
+		    , radius_1_(radius_1)
+		    , radius_2_(radius_2)
+		    , pen_(pen)
+		    , is_visible_(true)
+		{
+		    ellipse_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
+		    ellipse_item_->setPen(pen_);
+		    qDebug() << "Создана окружность с центром в (" << x << "," << y;
+		}
+		```
+* в методе прорисовки окружности вместо прямого использования координат центра применить вызовы соответствующих методов класса точек;
+	В методе Show теперь вызываем position_.GetX() и position_.GetY() у атрибута position_ класса Point:
+	```cpp
+	void Ellipse::Show(QGraphicsScene *scene) {
+	    if (!scene) {
+	        return; 
+	    }
+	
+	    if (!ellipse_item_) {
+	        ellipse_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
+	    }
+	
+	    if (ellipse_item_ && !ellipse_item_->scene()) {
+	        scene->addItem(ellipse_item_);
+	    }
+	
+	    if (ellipse_item_) {
+	        ellipse_item_->setPos(position_.GetX(), position_.GetY());
+	        ellipse_item_->setPen(pen_);
+	        ellipse_item_->setVisible(is_visible_);
+	    }
+	}
+	```
+* в методе перемещения окружности заменить прямую установку новых значений координат вызовом соответствующего метода класса точек.
+	В классе Ellipse есть атрибут position_ класса Point. В методе MoveTo вызываем метод GetX и GetY для перемещения:
+	```cpp
+	void Ellipse::MoveTo(int dx, int dy) {
+		position_.MoveToX(dx);
+		position_.MoveToY(dy);
+		if (ellipse_item_) {
+			ellipse_item_->setPos(position_.GetX() - radius_1_, position_.GetY() - radius_2_);
+		}
+	}
+	```
 
-Мы используем `std::variant` для хранения объектов разных типов фигур (Rectangle, Square, Ellipse, Line). Это позволяет хранить в одном векторе объекты разных типов.
+3. **Создать новый класс *Кольцо*, содержащий два свойства-окружности, два конструктора с выводом сообщения, а также методы прорисовки и перемещения.**
+	
+    Сам класс Ring находится в заголовочном файле — ring.h, реализация его методов в ring.cpp
+	<div align="center">
+	  <img src="https://github.com/user-attachments/assets/14fa9b35-052c-4567-b35a-96cfdd47bf13" alt="image" width="70%"> 
+	</div> 
+	
+	Свойства окружности:
+	```cpp
+	private:
+	    Ellipse outer_ellipse_; // Внешняя окружность
+	    Ellipse inner_ellipse_; // Внутренняя окружность
+	```
+	Два конструктора (их реализация хранится в ring.cpp, там же мы и выводим сообщение о создании окружностей):
+	```cpp
+	Ring();
+	Ring(int x, int y, int outer_radius_1, int outer_radius_2, int inner_radius_1, int inner_radius_2, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
+	```
+	Метод прорисовки:
+	```cpp
+	
+	// Прорисовка кольца
+	void Ring::Show(QGraphicsScene* scene) {
+	    outer_ellipse_.Show(scene);
+	
+	    // Обновление позиции внутреннего круга
+	    int innerX = outer_ellipse_.GetX() + outer_ellipse_.GetW() / 2 - inner_ellipse_.GetW() / 2;
+	    int innerY = outer_ellipse_.GetY() + outer_ellipse_.GetH() / 2 - inner_ellipse_.GetH() / 2;
+	    inner_ellipse_.SetX(innerX);
+	    inner_ellipse_.SetY(innerY);
+	
+	    inner_ellipse_.Show(scene);
+	}
+	```
+	Метод перемещения:
+	```cpp
+	// Перемещение кольца
+	void Ring::MoveTo(int dx, int dy) {
+	    outer_ellipse_.MoveTo(dx, dy);
+	    inner_ellipse_.MoveTo(dx, dy);
+	}
+	```
+
+4. **Внести аналогичные изменения в классы Отрезок и Прямоугольник.**
+Действия, аналогичные пункту 3 выполняются в `class Line` и `class Rectangle`.
+
+## В чём отличие л/р №1 от л/р №2?
+Здесь мы добавляем отдельный класс точек (class Point) и замена во всех классах атрибутов, которые отвечают за позиции X и Y на объект класса Point.
+
+## Как реализована проверка корректности выполнения операции MoveTo (перемещения фигуры)?
+Перемещение фигуры происходит при срабатывании сигнала `on_pushButton_ok_size_clicked` (то есть, нажатие на кнопку `pushButton_ok_size`), он же в свою очередь вызывает функцию `ApplyChangesToFigure`, где мы и проверяем корректность перемещения и новых размеров фигуры. 
+
 ```cpp
-using FigureVariant = std::variant<Rectangle, Square, Ellipse, Line>;
-```
+bool MainWindow::ApplyChangesToFigure(FigureVariant& figure, int dx, int dy, int new_w, int new_h, bool size_fields_filled, bool coord_fields_filled) {
+    // Получаем текущие координаты и размеры фигуры
+    int x = std::visit([](auto& fig) { return fig.GetX(); }, figure);
+    int y = std::visit([](auto& fig) { return fig.GetY(); }, figure);
+    int w = std::visit([](auto& fig) { return fig.GetW(); }, figure);
+    int h = std::visit([](auto& fig) { return fig.GetH(); }, figure);
 
-* Вектор figures_
-
-Вектор figures_ объявлен как член класса MainWindow:
-
-```cpp
-std::vector<FigureVariant> figures_;
-```
-
-Этот вектор хранит все созданные фигуры.
-
-5. Пример создания объектов
-Предположим, пользователь выбрал тип фигуры "Прямоугольник", ввел координаты (10, 20) и размеры (100, 50). Вот что произойдет:
-
-Вызов `CreateFigure(FigureType::rectangle_, 10, 20, 100, 50)` создаст объект Rectangle и вернет его как FigureVariant.
-
-Фигура будет добавлена в вектор figures_:
-
-```cpp
-figures_.push_back(new_figure);
-```
-
-Фигура будет отображена на сцене:
-
-```cpp
-ShowFigure(new_figure, scene.get());
-```
-
-### 14.   Написать обработчики команд создания примитивов, выполняющие следующие действия:
-
-*  создать новый объект вызовом конструктора со случайными параметрами примитива;
-Выбираем любой тип фигуры → В разделе создания нажимаем на стрелки. Благодаря этому у нас загружаются случайные числа в строки для ввода информации о координатах и размерах.
-
-Пример 1. Создаём 5 случайных фигур на холсте. Для этого указываем только нужное нам количество фигур — 5. После этого нажимаем на галочку и фигуры создаются в случайном порядке.
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/b6bf5493-b85d-4604-8e51-2b5f7c61ded9" alt="image"> 
-</div> 
-
-
-Пример 2. Создаём одну случайную фигуру в случайных координатах. Для этого указываем количество фигур — 1, а координаты можем ввести сами, а можем создать случайные. Для этого просто нажимаем на стрелочки и они вернут случайные значения.
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/df945db3-8602-4d69-bd9d-9b5cff06092c" alt="image"> 
-</div> 
-
-*  показать примитив методом Show.
-У каждого объекта есть свой метод Show, который просто отображает фигуру на холсте. То есть, тут можно просто показать реализацию этих методов для каждого класса и всё. Вот примеры:
-
-class Line:
-```cpp
-void Line::Show(QGraphicsScene *scene) {
-    // Если line_item_ еще не создан, создаем его
-    if (!line_item_) {
-        line_item_ = new QGraphicsLineItem(x_, y_, x2_, y2_);
-        line_item_->setPen(pen_);
-        scene->addItem(line_item_);
-    }
-    // Если создан, но не добавлен на сцену, добавляем его
-    else if (!line_item_->scene()) {
-        scene->addItem(line_item_);
+    // Если размеры не указаны, используем текущие размеры фигуры
+    if (!size_fields_filled) {
+        new_w = w;
+        new_h = h;
     }
 
-    // Устанавливаем параметры видимости и пера
-    line_item_->setPen(pen_);
-    line_item_->setVisible(is_visible_);
-}
-```
-
-class Rectangle:
-```cpp
-void Rectangle::Show(QGraphicsScene* scene) {
-    if (!rect_item_) {
-        rect_item_ = new QGraphicsRectItem(0, 0, w_, h_);
-    }
-    if (rect_item_ && !rect_item_->scene()) {
-        scene->addItem(rect_item_);
-    }
-    rect_item_->setPos(x_, y_);
-    rect_item_->setPen(pen_);
-}
-```
-
-### 15.   Написать обработчики команд перемещения примитивов в новую точку со случайными координатами, используя генерацию значений смещения координат в пределах [-50, 50].
-
-Эту логику реализуют функции MoveTo в каждом классе. Но они не от -50 до 50, а насколько захочет пользователь. Но там тоже есть кнопка генерации случайных чисел, поэтому если что можно вернуть и случайные числа.
-![image](https://github.com/user-attachments/assets/d90c608d-a87d-41a8-a397-40ae0ca667d6)
-
-
-### 16.   Написать обработчики команд изменения геометрических свойств объектов (радиус окружности, размеры прямоугольника, положение конечной точки отрезка и т.д.).
-
-Всё это реализуется в окне выше (15 пункт). Там можно изменять геометрию объекта.
-
-### 17.   Написать обработчики команд создания массивов объектов и группового изменения их свойств.
-Все фигуры создаются и добавляются в `std::vector<FigureVariant> figures_;` (находится в классе MainWindow). Обработка всех фигур целиком происходит в функции `MainWindow::on_checkBox_all_size_stateChanged`. Она выделяет все фигуры жёлтым цветом, а уже применение изменений происходит в функции `MainWindow::on_pushButton_ok_size_clicked` (в ней каждая строка расписана комментарием).
-
-```cpp
-void MainWindow::on_checkBox_all_size_stateChanged(int arg1) {
-    bool is_found = false;
-
-    switch (arg1) {
-    case Qt::Checked:
-        for (auto& figure : figures_) {
-            std::visit([this, &is_found](auto& fig) {
-                // Если current_figure_ равен not_defined_, выделяем все фигуры
-                if (current_figure_ == FigureType::not_defined_) {
-                    fig.SetPen(QColor(QString("#e9a000")), 5); // Выделяем цветом
-                    is_found = true;
-                }
-                // Иначе выделяем только те фигуры, которые соответствуют типу current_figure_
-                else if (fig.GetFigureType() == current_figure_) {
-                    fig.SetPen(QColor(QString("#e9a000")), 5); // Выделяем цветом
-                    is_found = true;
-                }
-
-                fig.Show(scene.get()); // Обновляем отображение фигуры на сцене
-            }, figure);
+    // Проверяем, можно ли переместить фигуру с новыми параметрами
+    if (MoveIsCorrect(x, y, new_w, new_h, dx, dy)) {
+        // Если поля смещения заполнены, перемещаем фигуру
+        if (coord_fields_filled) {
+            MoveFigure(figure, dx, dy);
+            ui->lineEdit_current_x->setText(QString::number(x + dx));
+            ui->lineEdit_current_y->setText(QString::number(y + dy));
         }
-
-        // Если ни одна фигура не была выделена, показываем предупреждение
-        if (!is_found) {
-            QMessageBox::warning(this, "Фигуры не выделены", "Проверьте схождение выбранного типа фигуры с тем типом, что в данный момент находится на холсте.");
-            ui->checkBox_all_size->setCheckState(Qt::Unchecked); // Сбрасываем флажок
-        } else {
-            // Если выбран чек-бокс «Все», запрещаем ввод индекса конкретной фигуры
-            ui->lineEdit_index_size->setReadOnly(true);
-            ClearLineEdit(); // Очищаем поля ввода
+        // Если поля размеров заполнены, изменяем размер фигуры
+        if (size_fields_filled) {
+            SetFigureSize(figure, new_w, new_h);
+            ui->lineEdit_current_w->setText(QString::number(new_w));
+            ui->lineEdit_current_h->setText(QString::number(new_h));
         }
-        break;
-
-    case Qt::Unchecked:
-        // Сбрасываем стиль для всех фигур
-        for (auto& figure : figures_) {
-            std::visit([this](auto& fig) {
-                fig.SetPen(QColor(QString("#7b6f5d")), 3); // Возвращаем стандартный цвет
-                fig.Show(scene.get()); // Обновляем отображение фигуры на сцене
-            }, figure);
-        }
-
-        // Снова разрешаем ввод индекса фигуры для поиска
-        ui->lineEdit_index_size->setReadOnly(false);
-        break;
+        return true;
+    } else {
+        return false;
     }
+}
+```
+
+Функция, которая в зависимости от типа фигуры, осуществляет проверку, будет ли новое положение фигуры корректным, учитывая её текущие координаты (X, Y) с размерами (W, H) для нового смещения (dx, dy):
+```cpp
+bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int h, const int dx, const int dy) const {
+    // Новые координаты после перемещения
+    int new_x = x + dx;
+    int new_y = y + dy;
+
+    // Проверяем, что новые координаты не выходят за пределы сцены
+    bool is_x_valid = new_x >= 0 && (new_x + w) <= scene->width();
+    bool is_y_valid = new_y >= 0 && (new_y + h) <= scene->height();
+
+    // Для линии проверяем обе точки
+    if (current_figure_ == FigureType::line_) {
+        int x1_new = new_x;
+        int y1_new = new_y;
+        int x2_new = new_x + w;
+        int y2_new = new_y + h;
+
+        is_x_valid = x1_new >= 0 && x1_new <= scene->width() &&
+                     x2_new >= 0 && x2_new <= scene->width();
+        is_y_valid = y1_new >= 0 && y1_new <= scene->height() &&
+                     y2_new >= 0 && y2_new <= scene->height();
+    }
+
+    return is_x_valid && is_y_valid;
 }
 ```
