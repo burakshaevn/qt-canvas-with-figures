@@ -17,6 +17,7 @@ Ellipse::Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen)
 {
     ellipse_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
     ellipse_item_->setPen(pen_);
+    qDebug() << "Создана окружность с центром в (" << x << "," << y;
 }
 
 void Ellipse::MoveTo(int dx, int dy) {
@@ -37,7 +38,7 @@ void Ellipse::SetSize(const int w, const int h) {
 
 void Ellipse::Show(QGraphicsScene *scene) {
     if (!scene) {
-        return; // Проверяем, что сцена существует
+        return;
     }
 
     if (!ellipse_item_) {
