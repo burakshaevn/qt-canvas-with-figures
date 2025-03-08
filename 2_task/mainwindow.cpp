@@ -129,6 +129,7 @@ bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int 
     return is_x_valid && is_y_valid;
 }
 
+// Возвращает корректные размеры и координаты для текущего типа фигуры
 std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
     const int minSize = 10;
     const int maxWidth = ui->graphicsView->width();
@@ -221,38 +222,58 @@ void MainWindow::on_pushButton_ok_create_clicked() {
     if (current_figure_ != FigureType::not_defined_) {
         size_t count = static_cast<size_t>(ui->lineEdit_count->text().toInt());
 
-        int x{};
-        int y{};
-        int w{};
-        int h{};
+        bool coords_and_size_ = !ui->lineEdit_x->text().isEmpty() && !ui->lineEdit_y->text().isEmpty() && !ui->lineEdit_w->text().isEmpty() && !ui->lineEdit_h->text().isEmpty();
 
-        bool has_been_mistakes = false;
-        for (size_t i = 0; i < count; ++i) {
-            x = ui->lineEdit_x->text().toInt();
-            y = ui->lineEdit_y->text().toInt();
-            w = ui->lineEdit_w->text().toInt();
-            h = ui->lineEdit_h->text().toInt();
+        if (count > 0 && coords_and_size_) {
 
-            try {
-                FigureVariant new_figure = CreateFigure(current_figure_, x, y, w, h);
+            bool has_been_mistakes = false;
+            for (size_t i = 0; i < count; ++i) {
+                int x = ui->lineEdit_x->text().toInt();
+                int y = ui->lineEdit_y->text().toInt();
+                int w = ui->lineEdit_w->text().toInt();
+                int h = ui->lineEdit_h->text().toInt();
 
-                if (MoveIsCorrect(x, y, w, h, 0, 0)) {
+                try {
+                    FigureVariant new_figure = CreateFigure(current_figure_, x, y, w, h);
+
+                    if (MoveIsCorrect(x, y, w, h, 0, 0)) {
+                        ShowFigure(new_figure, scene.get());
+                        figures_.push_back(new_figure);
+                    } else {
+                        has_been_mistakes = true;
+                    }
+                }
+                catch (const std::exception& e) {
+                    QMessageBox::critical(this, "Ошибка", e.what());
+                    return;
+                }
+            }
+
+            if (has_been_mistakes) {
+                QMessageBox::warning(this, "Ошибка", "Некоторые фигуры с некорректными координатами не были отображены.");
+            }
+            ClearLineEdit();
+        }
+
+        else if (count > 0 && !coords_and_size_){
+            for (size_t i = 0; i < count; ++i) {
+                auto [x, y, w, h] = GetCorrectFigure();
+
+                try {
+                    FigureVariant new_figure = CreateFigure(current_figure_, x, y, w, h);
                     ShowFigure(new_figure, scene.get());
                     figures_.push_back(new_figure);
-                } else {
-                    has_been_mistakes = true;
                 }
-            } catch (const std::invalid_argument& e) {
-                QMessageBox::critical(this, "Ошибка", e.what());
-                return;
+                catch (const std::exception& e) {
+                    QMessageBox::critical(this, "Ошибка", e.what());
+                    return;
+                }
             }
+            ClearLineEdit();
         }
 
-        if (has_been_mistakes) {
-            QMessageBox::warning(this, "Ошибка", "Некоторые фигуры с некорректными координатами не были отображены.");
-        }
-        ClearLineEdit();
-    } else {
+    }
+    else {
         QMessageBox::critical(this, "Ошибка", "Невозможно выполнить операцию. Выберите тип фигуры.");
     }
 }
