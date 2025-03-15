@@ -1,12 +1,8 @@
 # Реализация взаимодействия классов на основе агрегации
 
-Задачи, которые необходимо реализовать в л/р:
+Задачи, которые необходимо реализовать в л/р 2:
 
 1.  **Добавить новый класс для примитивов-точек, содержащий:** 
-Теперь у нас есть класс Point. Его объявление и реализация хранятся в point.h, исполняемого файла point.cpp у него нет.
-	 <div align="center">
-	  <img src="https://github.com/user-attachments/assets/0a827b5e-042a-4774-bc55-fa1df73a60e1" alt="image" width="70%"> 
-	</div> 
  * два свойства для хранения координат точки;
 	 ```cpp
 	 private:
@@ -39,86 +35,77 @@
 	}
 	```
 
+Теперь у нас есть класс Point. Его объявление и реализация хранятся в point.h, исполняемого файла point.cpp у него нет.
+	 <div align="center">
+	  <img src="https://github.com/user-attachments/assets/67eac549-e322-42f9-9c7d-defea749c216" alt="image"> 
+	</div> 
+
 2. **Внести следующие изменения в ранее созданный класс *Окружность*:**
 
 * заменить свойства-координаты одним свойством-точкой;
-	Это значит, что теперь в классе Ellipse за координаты у нас отвечает не две переменные: `int x_` и `int y_`, а всего одна — `Point position_`.
+	Это значит, что теперь в классе Circle за координаты у нас отвечает не две переменные: `int x_` и `int y_`, а всего одна — `Point position_`.
 * реализовать два конструктора, которые, кроме стандартных операций, выполняют дополнительно:
 	1. проверку значения радиуса и при необходимости - изменение его так, чтобы окружность не выходила за пределы области рисования;
 		Проверка происходит в функции MoveIsCorrect класса MainWindow. Для всех фигур проверка одинаковая, кроме если тип фигуры — линия. Для неё проверка будет другой (см. в коде).
 		```cpp
 		bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int h, const int dx, const int dy) const {
-			// Новые координаты после перемещения
-			int new_x = x + dx;
-			int new_y = y + dy;
+		    // Новые координаты после перемещения
+		    int new_x = x + dx;
+		    int new_y = y + dy;
 		
-			// Проверяем, что новые координаты не выходят за пределы сцены
-			bool is_x_valid = new_x >= 0 && (new_x + w) <= scene->width();
-			bool is_y_valid = new_y >= 0 && (new_y + h) <= scene->height();
+		    // Проверяем, что новые координаты не выходят за пределы сцены
+		    bool is_x_valid = new_x >= 0 && (new_x + w) <= scene->width();
+		    bool is_y_valid = new_y >= 0 && (new_y + h) <= scene->height();
 		
-			// Для линии проверяем обе точки
-			if (current_figure_ == FigureType::line_) {
-				int x1_new = new_x;
-				int y1_new = new_y;
-				int x2_new = new_x + w;
-				int y2_new = new_y + h;
-		
-				is_x_valid = x1_new >= 0 && x1_new <= scene->width() &&
-							 x2_new >= 0 && x2_new <= scene->width();
-				is_y_valid = y1_new >= 0 && y1_new <= scene->height() &&
-							 y2_new >= 0 && y2_new <= scene->height();
-			}
-		
-			return is_x_valid && is_y_valid;
+		    return is_x_valid && is_y_valid;
 		}
 		```
 	2. вывод сообщения о создании объекта-окружности;
 		Этот вывод происходит в конструкторе класса Ellipse с помощью команды qDebug() — она выводит текст на экран точно также как и cout в С++, но так как мы делаем всё это с помощью фреймворка Qt, за поток вывода у нас отвечает другая команда.
 		```cpp
-		Ellipse::Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen)
+		Circle::Circle(int x, int y, int radius_1, const QPen& pen)
 		    : position_(x, y)
-		    , radius_1_(radius_1)
-		    , radius_2_(radius_2)
+		    , radius_(radius_1)
 		    , pen_(pen)
 		    , is_visible_(true)
 		{
-		    ellipse_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
-		    ellipse_item_->setPen(pen_);
+		    Circle_item_ = new QGraphicsEllipseItem(0, 0, radius_ * 2, radius_ * 2);
+		    Circle_item_->setPen(pen_);
 		    qDebug() << "Создана окружность с центром в (" << x << "," << y;
 		}
 		```
 * в методе прорисовки окружности вместо прямого использования координат центра применить вызовы соответствующих методов класса точек;
 	В методе Show теперь вызываем position_.GetX() и position_.GetY() у атрибута position_ класса Point:
 	```cpp
-	void Ellipse::Show(QGraphicsScene *scene) {
+	void Circle::Show(QGraphicsScene *scene) {
 	    if (!scene) {
-	        return; 
+	        return;
 	    }
 	
-	    if (!ellipse_item_) {
-	        ellipse_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
+	    if (!Circle_item_) {
+	        Circle_item_ = new QGraphicsEllipseItem(0, 0, radius_ * 2, radius_ * 2);
 	    }
 	
-	    if (ellipse_item_ && !ellipse_item_->scene()) {
-	        scene->addItem(ellipse_item_);
+	    if (Circle_item_ && !Circle_item_->scene()) {
+	        scene->addItem(Circle_item_);
 	    }
 	
-	    if (ellipse_item_) {
-	        ellipse_item_->setPos(position_.GetX(), position_.GetY());
-	        ellipse_item_->setPen(pen_);
-	        ellipse_item_->setVisible(is_visible_);
+	    if (Circle_item_) {
+	        Circle_item_->setPos(position_.GetX(), position_.GetY());
+	        Circle_item_->setPen(pen_);
+	        Circle_item_->setVisible(is_visible_);
 	    }
 	}
 	```
 * в методе перемещения окружности заменить прямую установку новых значений координат вызовом соответствующего метода класса точек.
 	В классе Ellipse есть атрибут position_ класса Point. В методе MoveTo вызываем метод GetX и GetY для перемещения:
 	```cpp
-	void Ellipse::MoveTo(int dx, int dy) {
-		position_.MoveToX(dx);
-		position_.MoveToY(dy);
-		if (ellipse_item_) {
-			ellipse_item_->setPos(position_.GetX() - radius_1_, position_.GetY() - radius_2_);
-		}
+	void Circle::MoveTo(int dx, int dy) {
+	    position_.MoveToX(dx);
+	    position_.MoveToY(dy);
+	    if (Circle_item_) {
+	        Circle_item_->setPos(position_.GetX() - radius_, position_.GetY() - radius_);
+	    }
 	}
 	```
 
@@ -126,14 +113,14 @@
 	
     Сам класс Ring находится в заголовочном файле — ring.h, реализация его методов в ring.cpp
 	<div align="center">
-	  <img src="https://github.com/user-attachments/assets/14fa9b35-052c-4567-b35a-96cfdd47bf13" alt="image" width="70%"> 
+	  <img src="https://github.com/user-attachments/assets/0c4d6476-3d00-4292-95f5-586c33b4e510" alt="image"> 
 	</div> 
 	
 	Свойства окружности:
 	```cpp
 	private:
-	    Ellipse outer_ellipse_; // Внешняя окружность
-	    Ellipse inner_ellipse_; // Внутренняя окружность
+	    Circle outer_circle_; // Внешняя окружность
+	    Circle inner_circle_; // Внутренняя окружность
 	```
 	Два конструктора (их реализация хранится в ring.cpp, там же мы и выводим сообщение о создании окружностей):
 	```cpp
@@ -145,29 +132,35 @@
 	
 	// Прорисовка кольца
 	void Ring::Show(QGraphicsScene* scene) {
-	    outer_ellipse_.Show(scene);
+	    outer_circle_.Show(scene);
 	
 	    // Обновление позиции внутреннего круга
-	    int innerX = outer_ellipse_.GetX() + outer_ellipse_.GetW() / 2 - inner_ellipse_.GetW() / 2;
-	    int innerY = outer_ellipse_.GetY() + outer_ellipse_.GetH() / 2 - inner_ellipse_.GetH() / 2;
-	    inner_ellipse_.SetX(innerX);
-	    inner_ellipse_.SetY(innerY);
+	    int innerX = outer_circle_.GetX() + outer_circle_.GetW() / 2 - inner_circle_.GetW() / 2;
+	    int innerY = outer_circle_.GetY() + outer_circle_.GetH() / 2 - inner_circle_.GetH() / 2;
+	    inner_circle_.SetX(innerX);
+	    inner_circle_.SetY(innerY);
 	
-	    inner_ellipse_.Show(scene);
+	    inner_circle_.Show(scene);
 	}
 	```
 	Метод перемещения:
 	```cpp
 	// Перемещение кольца
 	void Ring::MoveTo(int dx, int dy) {
-	    outer_ellipse_.MoveTo(dx, dy);
-	    inner_ellipse_.MoveTo(dx, dy);
+	    outer_circle_.MoveTo(dx, dy);
+	    inner_circle_.MoveTo(dx, dy);
 	}
 	```
 
 4. **Внести аналогичные изменения в классы Отрезок и Прямоугольник.**
 Действия, аналогичные пункту 3 выполняются в `class Line` и `class Rectangle`.
 
+5.  **Самостоятельно придумать и реализовать 1-2 класса для манипуляций со сложными объектами, включающими более простые объекты Точка, Отрезок, Прямоугольник, Окружность.**
+	Реализуем класс House, который будет создавать дом на холсте. Он включает в себя более простые объекты — Square и Line. На самом верху квадрата строится треугольник, который образует крышу дома.
+	<div align="center">
+	  <img src="https://github.com/user-attachments/assets/47f0bcce-81b9-409d-ac0e-282ba92c82b9" alt="image"> 
+	</div> 
+	Объявление класса находится в файле house.h, его реализация — house.cpp
 ## В чём отличие л/р №1 от л/р №2?
 Здесь мы добавляем отдельный класс точек (class Point) и замена во всех классах атрибутов, которые отвечают за позиции X и Y на объект класса Point.
 
@@ -219,19 +212,6 @@ bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int 
     // Проверяем, что новые координаты не выходят за пределы сцены
     bool is_x_valid = new_x >= 0 && (new_x + w) <= scene->width();
     bool is_y_valid = new_y >= 0 && (new_y + h) <= scene->height();
-
-    // Для линии проверяем обе точки
-    if (current_figure_ == FigureType::line_) {
-        int x1_new = new_x;
-        int y1_new = new_y;
-        int x2_new = new_x + w;
-        int y2_new = new_y + h;
-
-        is_x_valid = x1_new >= 0 && x1_new <= scene->width() &&
-                     x2_new >= 0 && x2_new <= scene->width();
-        is_y_valid = y1_new >= 0 && y1_new <= scene->height() &&
-                     y2_new >= 0 && y2_new <= scene->height();
-    }
 
     return is_x_valid && is_y_valid;
 }
