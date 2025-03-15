@@ -4,12 +4,10 @@
 enum class FigureType{
     not_defined_,
     ellipse_,
-    circle_,
     rectangle_,
     square_,
     line_,
-    ring_,
-    house_
+    ring_
 };
 
 #endif // DOMAIN_H

@@ -15,6 +15,9 @@ public:
     Ellipse();
     Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
 
+    // Реализовывать деструктор здесь не нужно, потому что здесь нет динамического выделения памяти
+    // ~Ellipse();
+
     void MoveTo(int dx, int dy);
     void SetSize(const int w, const int h);
     void Show(QGraphicsScene *scene);
