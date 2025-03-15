@@ -8,8 +8,8 @@ enum class FigureType{
     rectangle_,
     square_,
     line_,
-    ring_//,
-    // triangle_
+    ring_,
+    house_
 };
 
 #endif // DOMAIN_H

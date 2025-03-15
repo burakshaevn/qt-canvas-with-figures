@@ -33,6 +33,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         domain.h
         point.h ring.h ring.cpp
         circle.h circle.cpp
+        house.h house.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

@@ -9,6 +9,7 @@
 #include "line.h"
 #include "ring.h"
 #include "circle.h"
+#include "house.h"
 #include "domain.h"
 
 #include <random>
@@ -31,7 +32,7 @@ public:
     ~MainWindow();
 
     // using FigureVariant = std::variant<Rectangle, Square, Ellipse, Line, Ring>;
-    using FigureVariant = std::variant<Rectangle, Square, Ellipse, Line, Ring, Circle>;
+    using FigureVariant = std::variant<Rectangle, Square, Ellipse, Line, Ring, Circle, House>;
 
 private slots:
     void on_comboBox_currentIndexChanged(int index);
@@ -67,8 +68,8 @@ private:
 
     void SetFigureSize(FigureVariant& figure, int w, int h) {
         std::visit([w, h](auto& fig) {
-            // if constexpr (std::is_same_v<std::decay_t<decltype(fig)>, Triangle>) {
-                // fig.SetSize(w, h, {fig.GetX(), fig.GetY()}); // Используем SetSize для Polygon
+            // if constexpr (std::is_same_v<std::decay_t<decltype(fig)>, House>) {
+                // fig.SetSize(w,); // Используем SetSize для Polygon
             // }
             // else {
                 fig.SetSize(w, h); // Для остальных фигур используем стандартный SetSize

@@ -42,6 +42,7 @@ void MainWindow::FillComboBox(){
     ui->comboBox->addItem("Квадрат");
     ui->comboBox->addItem("Линия");
     ui->comboBox->addItem("Кольцо");
+    ui->comboBox->addItem("Дом");
 }
 
 void MainWindow::SetLineEditSettings() {
@@ -92,6 +93,8 @@ MainWindow::FigureVariant MainWindow::CreateFigure(FigureType type, int x, int y
         return FigureVariant(Line(x, y, w, h));
     case FigureType::ring_:
         return FigureVariant(Ring(x, y, w / 2, w / 4));
+    case FigureType::house_:
+        return FigureVariant(House(x, y, std::min(w, h)));
     default:
         throw std::invalid_argument("Unknown figure type");
     }
@@ -130,37 +133,40 @@ std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
     int w = 0;
     int h = 0;
 
-    while (true) {
-        switch (current_figure_) {
-        case FigureType::square_: {
-            w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
-            int maxX = ui->graphicsView->width() - w;
-            int maxY = ui->graphicsView->height() - h;
-            x = GetRandomNumber(0, maxX);
-            y = GetRandomNumber(0, maxY);
-            break;
-        }
-        case FigureType::ring_: case FigureType::circle_: {
-            w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
-            int maxX = (ui->graphicsView->width() - w) / 2;
-            int maxY = (ui->graphicsView->height() - h) / 2;
-            x = GetRandomNumber(0, maxX);
-            y = GetRandomNumber(0, maxY);
-            break;
-        }
-        default: {
-                w = GetRandomNumber(minSize, maxWidth);
-                h = GetRandomNumber(minSize, maxHeight);
-                int maxX = (ui->graphicsView->width() - w) / 2;
-                int maxY = (ui->graphicsView->height() - h) / 2;
-                x = GetRandomNumber(0, maxX);
-                y = GetRandomNumber(0, maxY);
-                break;
-            }
-        }
-        return {x, y, w, h};
+    // Генерация случайных размеров
+    switch (current_figure_) {
+    case FigureType::square_:
+        w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
+        break;
+    case FigureType::ring_:
+    case FigureType::circle_:
+        w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
+        break;
+    case FigureType::house_:
+        w = GetRandomNumber(minSize, maxWidth);
+        h = GetRandomNumber(minSize, maxHeight / 2);
+        break;
+    default:
+        w = GetRandomNumber(minSize, maxWidth);
+        h = GetRandomNumber(minSize, maxHeight);
+        break;
     }
-    return {0, 0, 0, 0};
+
+    // Генерация случайных координат
+    int maxX = ui->graphicsView->width() - w;
+    int maxY = ui->graphicsView->height() - h;
+
+    // Для дома учитываем высоту крыши
+    if (current_figure_ == FigureType::house_) {
+        int roofHeight = h / 2;
+        maxY = std::max(0, ui->graphicsView->height() - (h + roofHeight)); // Учитываем полную высоту дома
+    }
+
+
+    x = GetRandomNumber(0, maxX);
+    y = GetRandomNumber(0, maxY);
+
+    return {x, y, w, h};
 }
 
 // Если из выпадающего списка выбран любой элемент, кроме пункта «Не выбрано»,
@@ -192,6 +198,9 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
         break;
     case 6: // «Кольцо»
         current_figure_ = FigureType::ring_;
+        break;
+    case 7: // «Дом»
+        current_figure_ = FigureType::house_;
         break;
     default:
         QMessageBox::warning(this, "Ошибка", "Неизвестный тип фигуры.");
