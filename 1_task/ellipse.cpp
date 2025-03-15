@@ -1,8 +1,7 @@
 #include "ellipse.h"
 
 Ellipse::Ellipse()
-    : x_(0)
-    , y_(0)
+    : position_(0, 0)
     , radius_1_(0)
     , radius_2_(0)
     , is_visible_(true)
@@ -10,8 +9,7 @@ Ellipse::Ellipse()
 {}
 
 Ellipse::Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen)
-    : x_(x)
-    , y_(y)
+    : position_(x, y)
     , radius_1_(radius_1)
     , radius_2_(radius_2)
     , pen_(pen)
@@ -22,10 +20,10 @@ Ellipse::Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen)
 }
 
 void Ellipse::MoveTo(int dx, int dy) {
-    x_ += dx;
-    y_ += dy;
+    position_.MoveToX(dx);
+    position_.MoveToY(dy);
     if (ellipse_item_) {
-        ellipse_item_->setPos(x_ - radius_1_, y_ - radius_2_);
+        ellipse_item_->setPos(position_.GetX() - radius_1_, position_.GetY() - radius_2_);
     }
 }
 
@@ -51,7 +49,7 @@ void Ellipse::Show(QGraphicsScene *scene) {
     }
 
     if (ellipse_item_) {
-        ellipse_item_->setPos(x_, y_);
+        ellipse_item_->setPos(position_.GetX(), position_.GetY());
         ellipse_item_->setPen(pen_);
         ellipse_item_->setVisible(is_visible_);
     }
@@ -64,14 +62,17 @@ void Ellipse::RemoveFromScene(QGraphicsScene *scene) {
 }
 
 int Ellipse::GetX() const {
-    return x_;
+    return position_.GetX();
 }
+
 int Ellipse::GetY() const {
-    return y_;
+    return position_.GetY();
 }
+
 int Ellipse::GetW() const {
     return radius_1_ * 2;
 }
+
 int Ellipse::GetH() const {
     return radius_2_ * 2;
 }

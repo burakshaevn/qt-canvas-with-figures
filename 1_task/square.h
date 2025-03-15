@@ -6,6 +6,7 @@
 #include <QPen>
 
 #include "domain.h"
+#include "point.h"
 
 class Square {
 public:
@@ -29,11 +30,10 @@ public:
     FigureType GetFigureType() const;
 
 private:
-    int x_;
-    int y_;
-    int size_;
-    QPen pen_;
-    QGraphicsRectItem* rect_item_;
+    Point position_; // Позиция квадрата
+    int size_;       // Размер стороны квадрата
+    QPen pen_;       // Перо для отрисовки
+    QGraphicsRectItem* rect_item_; // Графический элемент
 };
 
 #endif // SQUARE_H

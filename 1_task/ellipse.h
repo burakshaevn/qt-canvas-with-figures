@@ -6,6 +6,7 @@
 #include <QPen>
 
 #include "domain.h"
+#include "point.h"
 
 enum class FigureType;
 
@@ -35,10 +36,9 @@ private:
     int radius_1_;
     int radius_2_;
 
-    int x_ = 0;
-    int y_ = 0;
+    Point position_;
     bool is_visible_ = true;
-    QPen pen_ = QPen(QColor("#7b6f5d"));
+    QPen pen_ = QPen(QColor("#7b6f5d"), 3);
 
     QGraphicsEllipseItem* ellipse_item_;
 };

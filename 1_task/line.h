@@ -6,6 +6,7 @@
 #include <QPen>
 
 #include "domain.h"
+#include "point.h"
 
 class Line {
 public:
@@ -36,12 +37,10 @@ public:
     FigureType GetFigureType() const;
 
 private:
-    int x_ = 0;
-    int y_ = 0;
-    int x2_ = 0;
-    int y2_ = 0;
-    int w_ = 0;
-    int h_ = 0;
+    Point start_; // Начальная точка линии
+    Point end_;   // Конечная точка линии
+    int w_ = 0;   // Ширина (разница по X)
+    int h_ = 0;   // Высота (разница по Y)
     bool is_visible_ = true;
     QPen pen_ = QPen(QColor("#7b6f5d"), 3);
     QGraphicsLineItem* line_item_;

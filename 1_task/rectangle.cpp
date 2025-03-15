@@ -1,10 +1,15 @@
 #include "rectangle.h"
 
-Rectangle::Rectangle() = default;
+Rectangle::Rectangle()
+    : position_(0, 0)
+    , w_(0)
+    , h_(0)
+    , pen_(QPen(QColor("#7b6f5d"), 3))
+    , rect_item_(nullptr)
+{}
 
 Rectangle::Rectangle(int x, int y, int w, int h, const QPen& pen)
-    : x_(x)
-    , y_(y)
+    : position_(x, y)
     , w_(w)
     , h_(h)
     , pen_(pen)
@@ -12,10 +17,10 @@ Rectangle::Rectangle(int x, int y, int w, int h, const QPen& pen)
 {}
 
 void Rectangle::MoveTo(int dx, int dy) {
-    x_ += dx;
-    y_ += dy;
+    position_.MoveToX(dx);
+    position_.MoveToY(dy);
     if (rect_item_) {
-        rect_item_->setPos(x_, y_);
+        rect_item_->setPos(position_.GetX(), position_.GetY());
     }
 }
 
@@ -34,7 +39,7 @@ void Rectangle::Show(QGraphicsScene* scene) {
     if (rect_item_ && !rect_item_->scene()) {
         scene->addItem(rect_item_);
     }
-    rect_item_->setPos(x_, y_);
+    rect_item_->setPos(position_.GetX(), position_.GetY());
     rect_item_->setPen(pen_);
 }
 
@@ -47,14 +52,17 @@ void Rectangle::RemoveFromScene(QGraphicsScene* scene) {
 }
 
 int Rectangle::GetX() const {
-    return x_;
+    return position_.GetX();
 }
+
 int Rectangle::GetY() const {
-    return y_;
+    return position_.GetY();
 }
+
 int Rectangle::GetW() const {
     return w_;
 }
+
 int Rectangle::GetH() const {
     return h_;
 }
