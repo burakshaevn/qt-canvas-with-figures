@@ -37,12 +37,7 @@
 Теперь у нас есть класс Point. Его объявление и реализация хранятся в point.h, исполняемого файла point.cpp у него нет.
 	 <div align="center">
 	  <img src="https://github.com/user-attachments/assets/0a827b5e-042a-4774-bc55-fa1df73a60e1" alt="image" width="70%"> 
-	</div> 
-
-Теперь у нас есть класс Point. Его объявление и реализация хранятся в point.h, исполняемого файла point.cpp у него нет.
-	 <div align="center">
-	  <img src="https://github.com/user-attachments/assets/67eac549-e322-42f9-9c7d-defea749c216" alt="image"> 
-	</div> 
+	</div>  
 
 2. **Внести следующие изменения в ранее созданный класс *Окружность*:**
 
