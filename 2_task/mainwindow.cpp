@@ -37,6 +37,7 @@ void MainWindow::FillComboBox(){
     ui->comboBox->addItem("Не выбрано");
     ui->comboBox->setCurrentText("Не выбрано");
     ui->comboBox->addItem("Эллипс");
+    ui->comboBox->addItem("Окружность");
     ui->comboBox->addItem("Прямоугольник");
     ui->comboBox->addItem("Квадрат");
     ui->comboBox->addItem("Линия");
@@ -47,7 +48,7 @@ void MainWindow::SetLineEditSettings() {
     QList<QLineEdit*> lineEdits = findChildren<QLineEdit*>();
 
     for (QLineEdit* lineEdit : lineEdits) {
-        if (lineEdit->parentWidget() == ui->page_2) { // Убедитесь, что родитель - это page_2
+        if (lineEdit->parentWidget() == ui->page_2) {
             lineEdit->setMaxLength(5);
             lineEdit->setAlignment(Qt::AlignCenter);
         }
@@ -80,15 +81,17 @@ int MainWindow::GetRandomNumber(const int min, const int max) const {
 MainWindow::FigureVariant MainWindow::CreateFigure(FigureType type, int x, int y, int w, int h) {
     switch (type) {
     case FigureType::ellipse_:
-        return FigureVariant(Ellipse(x, y, w / 2, h / 2)); // Явно создаем std::variant с Ellipse
+        return FigureVariant(Ellipse(x, y, w / 2, h / 2));
+    case FigureType::circle_:
+        return FigureVariant(Circle(x, y, w / 2));
     case FigureType::rectangle_:
-        return FigureVariant(Rectangle(x, y, w, h)); // Явно создаем std::variant с Rectangle
+        return FigureVariant(Rectangle(x, y, w, h));
     case FigureType::square_:
-        return FigureVariant(Square(x, y, std::min(w, h))); // Явно создаем std::variant с Square
+        return FigureVariant(Square(x, y, std::min(w, h)));
     case FigureType::line_:
-        return FigureVariant(Line(x, y, w, h)); // Явно создаем std::variant с Line
+        return FigureVariant(Line(x, y, w, h));
     case FigureType::ring_:
-        return FigureVariant(Ring(x, y, w / 2, h / 2, w / 4, h / 4)); // Явно создаем std::variant с Line
+        return FigureVariant(Ring(x, y, w / 2, w / 4));
     default:
         throw std::invalid_argument("Unknown figure type");
     }
@@ -113,19 +116,6 @@ bool MainWindow::MoveIsCorrect(const int x, const int y, const int w, const int 
     bool is_x_valid = new_x >= 0 && (new_x + w) <= scene->width();
     bool is_y_valid = new_y >= 0 && (new_y + h) <= scene->height();
 
-    // Для линии проверяем обе точки
-    if (current_figure_ == FigureType::line_) {
-        int x1_new = new_x;
-        int y1_new = new_y;
-        int x2_new = new_x + w;
-        int y2_new = new_y + h;
-
-        is_x_valid = x1_new >= 0 && x1_new <= scene->width() &&
-                     x2_new >= 0 && x2_new <= scene->width();
-        is_y_valid = y1_new >= 0 && y1_new <= scene->height() &&
-                     y2_new >= 0 && y2_new <= scene->height();
-    }
-
     return is_x_valid && is_y_valid;
 }
 
@@ -141,27 +131,34 @@ std::tuple<int, int, int, int> MainWindow::GetCorrectFigure() const {
     int h = 0;
 
     while (true) {
-        if (current_figure_ == FigureType::square_) {
+        switch (current_figure_) {
+        case FigureType::square_: {
             w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
             int maxX = ui->graphicsView->width() - w;
             int maxY = ui->graphicsView->height() - h;
             x = GetRandomNumber(0, maxX);
             y = GetRandomNumber(0, maxY);
+            break;
         }
-        else {
-            w = GetRandomNumber(minSize, maxWidth);
-            h = GetRandomNumber(minSize, maxHeight);
+        case FigureType::ring_: case FigureType::circle_: {
+            w = h = GetRandomNumber(minSize, std::min(maxWidth, maxHeight) / 2);
             int maxX = (ui->graphicsView->width() - w) / 2;
             int maxY = (ui->graphicsView->height() - h) / 2;
             x = GetRandomNumber(0, maxX);
             y = GetRandomNumber(0, maxY);
+            break;
         }
-        if (MoveIsCorrect(x, y, w, h, 0, 0)){
-            return {x, y, w, h};
+        default: {
+                w = GetRandomNumber(minSize, maxWidth);
+                h = GetRandomNumber(minSize, maxHeight);
+                int maxX = (ui->graphicsView->width() - w) / 2;
+                int maxY = (ui->graphicsView->height() - h) / 2;
+                x = GetRandomNumber(0, maxX);
+                y = GetRandomNumber(0, maxY);
+                break;
+            }
         }
-        else{
-            continue;
-        }
+        return {x, y, w, h};
     }
     return {0, 0, 0, 0};
 }
@@ -181,16 +178,19 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
     case 1: // «Эллипс»
         current_figure_ = FigureType::ellipse_;
         break;
-    case 2: // «Прямоугольник»
+    case 2: // «Окружность»
+        current_figure_ = FigureType::circle_;
+        break;
+    case 3: // «Прямоугольник»
         current_figure_ = FigureType::rectangle_;
         break;
-    case 3: // «Квадрат»
+    case 4: // «Квадрат»
         current_figure_ = FigureType::square_;
         break;
-    case 4: // «Линия»
+    case 5: // «Линия»
         current_figure_ = FigureType::line_;
         break;
-    case 5: // «Кольцо»
+    case 6: // «Кольцо»
         current_figure_ = FigureType::ring_;
         break;
     default:
@@ -206,7 +206,6 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
 
 void MainWindow::on_pushButton_random_create_clicked() {
     auto [x, y, w, h] = GetCorrectFigure();
-    // ui->lineEdit_count->setText(QString::number(GetRandomNumber(2, 20)));
     ui->lineEdit_x->setText(QString::number(x));
     ui->lineEdit_y->setText(QString::number(y));
     ui->lineEdit_w->setText(QString::number(w));
@@ -225,7 +224,6 @@ void MainWindow::on_pushButton_ok_create_clicked() {
         bool coords_and_size_ = !ui->lineEdit_x->text().isEmpty() && !ui->lineEdit_y->text().isEmpty() && !ui->lineEdit_w->text().isEmpty() && !ui->lineEdit_h->text().isEmpty();
 
         if (count > 0 && coords_and_size_) {
-
             bool has_been_mistakes = false;
             for (size_t i = 0; i < count; ++i) {
                 int x = ui->lineEdit_x->text().toInt();
@@ -238,7 +236,7 @@ void MainWindow::on_pushButton_ok_create_clicked() {
 
                     if (MoveIsCorrect(x, y, w, h, 0, 0)) {
                         ShowFigure(new_figure, scene.get());
-                        figures_.push_back(new_figure);
+                        figures_.push_back(new_figure); // Добавляем фигуру в figures_
                     } else {
                         has_been_mistakes = true;
                     }
@@ -254,15 +252,14 @@ void MainWindow::on_pushButton_ok_create_clicked() {
             }
             ClearLineEdit();
         }
-
-        else if (count > 0 && !coords_and_size_){
+        else if (count > 0 && !coords_and_size_) {
             for (size_t i = 0; i < count; ++i) {
                 auto [x, y, w, h] = GetCorrectFigure();
 
                 try {
                     FigureVariant new_figure = CreateFigure(current_figure_, x, y, w, h);
                     ShowFigure(new_figure, scene.get());
-                    figures_.push_back(new_figure);
+                    figures_.push_back(new_figure); // Добавляем фигуру в figures_
                 }
                 catch (const std::exception& e) {
                     QMessageBox::critical(this, "Ошибка", e.what());
@@ -271,7 +268,6 @@ void MainWindow::on_pushButton_ok_create_clicked() {
             }
             ClearLineEdit();
         }
-
     }
     else {
         QMessageBox::critical(this, "Ошибка", "Невозможно выполнить операцию. Выберите тип фигуры.");
@@ -435,6 +431,7 @@ bool MainWindow::ApplyChangesToFigure(FigureVariant& figure, int dx, int dy, int
         }
         return true;
     } else {
+        // QMessageBox::warning(this, "Ошибка", "Фигура выходит за пределы холста.");
         return false;
     }
 }

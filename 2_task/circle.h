@@ -1,5 +1,5 @@
-#ifndef ELLIPSE_H
-#define ELLIPSE_H
+#ifndef CIRCLE_H
+#define CIRCLE_H
 
 #include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
@@ -10,10 +10,10 @@
 
 enum class FigureType;
 
-class Ellipse {
+class Circle {
 public:
-    Ellipse();
-    Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
+    Circle();
+    Circle(int x, int y, int radius_, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
 
     void MoveTo(int dx, int dy);
     void SetSize(const int w, const int h);
@@ -29,21 +29,20 @@ public:
     // Методы для получения координат и размеров
     int GetX() const;
     int GetY() const;
-    int GetW() const; // Ширина = диаметр по горизонтали
-    int GetH() const; // Высота = диаметр по вертикали
+    int GetW() const;
+    int GetH() const;
 
     void SetPen(const QPen& pen, const int pen_width);
     FigureType GetFigureType() const;
 
 private:
-    int radius_1_;
-    int radius_2_;
+    int radius_;
 
     Point position_;
     bool is_visible_ = true;
     QPen pen_ = QPen(QColor("#7b6f5d"), 3);
 
-    QGraphicsEllipseItem* ellipse_item_;
+    QGraphicsEllipseItem* Circle_item_;
 };
 
-#endif // ELLIPSE_H
+#endif // CIRCLE_H
