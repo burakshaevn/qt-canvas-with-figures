@@ -1,118 +1,241 @@
-# Создание графических примитивов
+# Создание и использование библиотеки классов для графических примитивов на основе принципа наследования
 
-## Описание
-В программе создаются отдельные классы для графических примитивов:
-* Абстрактный класс Figure
-* Эллипс (Ellipse)
-* Круг (Circle)
-* Прямоугольник (Rectangle)
-* Квадрат (Square)
-* Отрезок (Line)
+Задачи, которые необходимо реализовать в л/р 3:
 
-### Задание
-Каждый класс должен содержать следующие свойства:
-1. Координаты базовой точки (например, x, y)
-2. Размеры (например, радиус для окружности, ширина и высота для прямоугольника)
-3. Признак видимости (например, флаг isVisible)
-4. Конструкторы:
-    * Каждый класс должен иметь как минимум два конструктора:
-    * Конструктор по умолчанию
-    * Конструктор с параметрами для инициализации свойств примитива
-  
-5. Методы классов:
-    * `void MoveTo(const int dx, const int dy);` — перемещает объект на смещение (dx, dy).
-    * `void Show(QGraphicsScene* scene);` — отображает примитив на экране, в качестве параметра принимает указатель на холст.
-    * `void RemoveFromScene(QGraphicsScene* scene);` — переопределяемый метод, который обязательно реализует каждый класс, наследующий Figure. Сам метод выполняет корректное удаление объекта с холста.
-6. Уникальные методы для каждого класса:
-    Написать обработчики команд изменения геометрических свойств объектов (радиус окружности, размеры прямоугольника, положение конечной точки отрезка и т.д.).
-8. Подключение модулей:
-    * Каждый класс должен быть оформлен в виде отдельного модуля (файла .cpp и .h). 
-9. Возможность создать новый объект с случайными параметрами и отобразить его на холсте.
-10. Возможность изменения свойств примитивов (например, радиуса для окружности или размеров для прямоугольника).
-11. Возможность создания массива графических примитивов и методы для группового изменения их свойств.
+1. **В интерфейсный раздел модуля-библиотеки ввести описание класса Figure, используя для задания абстрактных методов директиву abstract в заголовке метода.**
 
-## Описание реализации
-В качестве «холста» используется специальный компонент для отображения (то есть, специальный виджет) — `QGraphicsView`.
-<details>
-<summary>Абстрактный класс Figure </summary>
-Абстрактный базовый класс Figure реализует общие характеристики для всех графических примитивов:
+У нас есть абстрактный класс Figure. В С++ мы не пишем «abstract» у класса, чтобы сделать его таким. Здесь мы говорим что он абстрактный благодаря тому, что у класса есть хотя бы один **чисто виртуальный метод**, не путать с **обычными виртуальными методами**.
+```cpp
+virtual void FooName() = 0; // чисто виртуальный метод
+virtual void FooName(); // обычная виртуальная функция
+```
+Если в классе есть хотя бы один чисто виртуальный метод, класс — абстрактный. Объявление класса Figure хранится в файле figure.h, реализация в исполнительном файле figure.cpp.
 
-Свойства:
-* Координаты базовой точки (x, y)
-* Размеры (w, h)
-* Признак видимости (is_visible_)
-* Стиль обводки (pen_)
-* Тип фигуры (figure_type_), представленный перечислением FigureType
+figure.h:
+```cpp
+#ifndef FIGURE_H
+#define FIGURE_H
 
-Методы:
-* Чисто виртуальные методы: MoveTo, Show, RemoveFromScene
-* Методы для установки и получения координат, размеров, видимости, стиля обводки и типа фигуры.
-</details>
+#include <QGraphicsGridLayout>
+#include <QPen>
+#include <QMessageBox>
+#include "point.h"
 
-<details>
-<summary>Класс Ellipse </summary>
-Класс Ellipse наследуется от Figure и включает дополнительные свойства и методы для работы с эллипсами:
+enum class FigureType{
+    not_defined_,
+    ellipse_,
+    circle_,
+    rectangle_,
+    square_,
+    line_,
+    ring_,
+    house_,
+    trapezoid_,
+    rhomb_
+};
 
-Уникальные свойства:
-* Радиусы эллипса (radius_1_, radius_2_).
+class Figure {
+public:
+    Figure();
+    Figure(Point position, int w, int h, const QPen& pen = QPen(QColor("#7b6f5d")), const int pen_width = 3, const FigureType& figure_type = FigureType::not_defined_);
 
-Уникальные методы:
-* SetSize: изменяет радиусы эллипса.
-* Графический элемент QGraphicsEllipseItem для отображения на сцене.
-</details>
+    ~Figure();
 
-<details>
-<summary>Класс Circle</summary>
-Класс Circle наследуется от Ellipse и реализует окружность, где радиусы одинаковы:
+    // Чисто виртуальные методы, которые обязан реализовать каждый наследник Figure
+    // Чисто виртуальные методы это которые имеют вид virtual ... =0
+    virtual void MoveTo(const int dx, const int dy) = 0;
+    virtual void Show(QGraphicsScene* scene) = 0;
+    virtual void RemoveFromScene(QGraphicsScene* scene) = 0;
+    virtual void SetVisible(bool visible) = 0;
+    virtual bool GetVisible() const = 0;
 
-Уникальные методы:
-* SetSize: изменяет радиус круга.
-</details>
+    // Здесь мы оставляем {} после заголовка функции имя в виду что реализация функции пуста,
+    // потому что такие классы, как House, Line, Circle и Ring, они не имеют заголовка этой функции в .h файлах
+    // и этой функции и не будет у этих классов. Поэтому они будут «ссылаться» на эту пустую реализацию ниже
+    virtual void Rotate(const int degrees, QGraphicsScene* scene) {}
 
-<details>
-<summary>Класс Rectangle</summary>
-Класс Rectangle наследуется от Figure и используется для работы с прямоугольниками:
+    virtual void SetCoords(const int x, const int y) = 0;
+    virtual int GetX() const = 0;
+    virtual int GetY() const = 0;
 
-Методы:
-* SetSize: устанавливает размеры прямоугольника.
-* Графический элемент QGraphicsRectItem для отображения на сцене.
-</details>
+    virtual void SetSize(const int w, const int h) = 0;
+    virtual int GetW() const = 0;
+    virtual int GetH() const = 0;
 
-<details>
-<summary>Класс Line</summary>
-Класс Line наследуется от Figure и представляет линию:
+    // Pen отвечает за цвет и толщину обводки фигуры.
+    // Эти методы мы позволяем переопределить потому что, например, House состоит из нескольких фигур: линия и квдарат,
+    // или, например, Circle состоит из двух окружностей разных размеров.
+    // Поэтому, чтобы задать им нужную обводку, нужно обработать каждую фигуру,
+    // которая входит в композицию. Поэтому сделать «общую» реализацию здесь нельзя,
+    // нужно каждому классу свою реализацию этих методов
+    virtual void SetPen(const QPen& pen, const int pen_width) = 0;
+    virtual QPen GetPen() const = 0;
 
-Уникальные свойства:
-* Координаты конца линии (x2_, y2_).
+    void SetFigureType(const FigureType& figure_type);
+    FigureType GetFigureType() const;
 
-Методы:
-* MoveTo: перемещает линию.
-* SetSize: устанавливает размеры линии.
-* Метод поворота Rotate (отсутствует в оригинальной реализации, но может быть добавлен в будущем).
-* Графический элемент QGraphicsLineItem для отображения на сцене.
-</details>
+protected:
+    Point position_;
+    int w_;
+    int h_;
+    bool is_visible_;
+    QPen pen_;
+    FigureType figure_type_;
+};
 
-<details>
-<summary>Класс Square</summary>
-Класс Square наследуется от Rectangle и делает его свойства специфичными для квадрата:
+#endif // FIGURE_H
+```
 
-Методы:
-* SetSize: изменяет размеры квадрата, сохраняя равенство ширины и высоты.
-</details>
+2.     **Создать класс окружностей Circle как потомка класса Figure с добавлением нового свойства – радиуса окружности, собственным конструктором, методом Show, методом  MoveTo и новым методом изменения радиуса.**
 
-## Сборка и запуск
-Требования:
-* C++17
-* Qt 5.15+
-  
-Сборка и запуск:
-* Для Visual Studio:
-  Преходим в папку ../1_task/ 
-  ```bash
-  mkdir build
-  cd build
-  cmake ..
-  cmake --build .
-  ```
-* Для Qt Creator:
-   Открываем Qt Creator → Open Project → Указываем путь до папки с решением → Открываем CMakeLists.txt → кнопка Configure
+Объявление класса Circle содержится в circle.h, реализация его методов — в circle.cpp:
+```cpp
+#ifndef CIRCLE_H
+#define CIRCLE_H
+
+#pragma once
+
+#include "figure.h"
+
+#include <QGraphicsScene>
+#include <QGraphicsEllipseItem>
+#include <QPen>
+
+class Circle : public Figure {
+public:
+    Circle();
+    Circle(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::ellipse_);
+    virtual ~Circle();
+    void MoveTo(int x, int y) override;
+    void SetSize(const int w, const int h) override;
+    void Show(QGraphicsScene *scene) override;
+    void RemoveFromScene(QGraphicsScene* scene) override; 
+
+    void SetVisible(bool visible) override;
+    bool GetVisible() const override;
+
+protected:
+    int radius_1_;
+    int radius_2_;
+
+    // Элемент для отображения окружности. Это класс из библиотеки фрейморка Qt, представляющий графический элемент,
+    // который рисует окружность на сцене в рамках холста QGraphicsView.
+    QGraphicsEllipseItem* circle_item_;
+};
+
+#endif // CIRCLE_H
+```
+
+У функций этого класса есть слово `override` это функция из базового класса (Figure) и она будет перегружена (определена своя логика).
+
+3.     **Дать программную реализацию конструктора дочернего класса окружностей, ОБЯЗАТЕЛЬНО начинающуюся с вызова конструктора родителя, в конце предусмотреть вывод сообщения о создании объекта.**
+```cpp
+Circle::Circle(int x, int y, int radius_1, int radius_2, const QPen& pen, const FigureType& figure_type)
+    : Figure({x, y}, radius_1 * 2, radius_2 * 2, pen, 3, figure_type)
+    , radius_1_(radius_1)
+    , radius_2_(radius_2)
+{
+    circle_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
+    circle_item_->setPen(pen);
+    SetFigureType(FigureType::circle_);
+    qDebug() << "Создана окружность с центром в (" << x << ',' << y << ") и радиусом " << radius_1 << " и внутренним радиусом " << radius_2 << '.';
+}
+```
+Вызов конструктора родителя происходит в строке `Figure({x, y}, radius_1 * 2, radius_2 * 2, pen, 3, figure_type)`. 
+
+4.     **В основном (демонстрационном) модуле предусмотреть создание объектов-окружностей, их перемещение и изменение радиуса.** 
+
+В выпадающем списке появляется возможность добавлять окружность и эллипс. 
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/fea7b684-e3c3-41b5-9a07-650e282146d0" alt="image"> 
+</div> 
+
+5.     **На базе класса Circle создать дочерний подкласс эллипсов добавлением свойства-полуоси. Реализовать свой конструктор и методы прорисовки и перемещения. Для поворота на 90 градусов ввести новый метод.** 
+
+Метод поворота на 90 градусов является чисто виртуальной функцией из базового класса Figure. То есть, класс Ellipse переопределяет функцию базового класса `Figure::Ellipse`. Для окружности этого метода нет потому что её положение никак не изменится.
+```cpp
+#ifndef ELLIPSE_H
+#define ELLIPSE_H
+
+#pragma once
+
+#include "circle.h"
+
+class Ellipse : public Circle {
+public:
+    Ellipse();
+    Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d")));
+    ~Ellipse();
+    void SetSize(const int w, [[maybe_unused]] const int h) override;
+
+    void Rotate(const int degrees, QGraphicsScene* scene) override;
+};
+
+#endif // ELLIPSE_H
+```
+
+Сама функция принимает целочисленное значение — на сколько градусов повернуть фигуру. Вторым параметром передаётся указатель на холст, чтобы внутри функции Rotate проверить, останется ли фигура в пределах холста, если выполнить поворот на указанное количество градусов. Классы, для которых доступен поворот на 90 градусов:
+* `class Ellipse`,
+* `class Rectangle`,
+* `class Trapezoid`,
+* `class Rhomb`.
+6.  **Аналогично создать класс четырехугольников и подклассы для ромбов, трапеций, прямоугольников и проверить их работоспособность.**
+Добавляем класс Rhomb:
+```cpp
+#ifndef Rhomb_H
+#define Rhomb_H
+
+#include "rectangle.h"
+#include <QGraphicsPolygonItem>
+
+class Rhomb : public Rectangle {
+public:
+    Rhomb();
+    Rhomb(int x, int y, int side, int height, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::rhomb_);
+    virtual ~Rhomb();
+
+    void MoveTo(const int dx, const int dy) override;
+    void SetSize(const int side, const int height) override;
+    void Show(QGraphicsScene* scene) override;
+    void RemoveFromScene(QGraphicsScene* scene) override;
+
+    void Rotate(const int degrees, QGraphicsScene* scene) override;
+
+protected:
+    QGraphicsPolygonItem* rhomb_item_;
+    int side_;  // Длина стороны ромба
+    int height_; // Высота ромба
+};
+
+#endif // RHOMB_H
+```
+и класс Trapezoid:
+```cpp
+#ifndef TRAPEZOID_H
+#define TRAPEZOID_H
+
+#include "rectangle.h"
+#include <QGraphicsPolygonItem>
+
+class Trapezoid : public Rectangle {
+public:
+    Trapezoid();
+    Trapezoid(int x, int y, int base1, int base2, int height, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::trapezoid_);
+    virtual ~Trapezoid();
+
+    void MoveTo(const int dx, const int dy) override;
+    void SetSize(const int base1, const int base2, const int height);
+    void Show(QGraphicsScene* scene) override;
+    void RemoveFromScene(QGraphicsScene* scene) override;
+
+    void Rotate(const int degrees, QGraphicsScene* scene) override;
+
+protected:
+    QGraphicsPolygonItem* trapezoid_item_;
+    int base1_;  // Длина первого основания
+    int base2_;  // Длина второго основания
+    int height_; // Высота трапеции
+};
+
+#endif // TRAPEZOID_H
+```
