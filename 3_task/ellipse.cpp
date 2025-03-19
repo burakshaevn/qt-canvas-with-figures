@@ -2,51 +2,46 @@
 
 Ellipse::Ellipse() = default;
 
-Ellipse::Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen, const FigureType& figure_type)
-    : Figure({x, y}, radius_1 * 2, radius_2 * 2, pen, 3, figure_type)
-    , radius_1_(radius_1)
-    , radius_2_(radius_2)
+Ellipse::Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen)
+    : Circle(x, y, radius_1, radius_2, pen, FigureType::ellipse_)
 {
-    ellipse_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
-    ellipse_item_->setPen(pen);
+    // Устанавливаем только один радиус в оба радиуса, так как это круг (один диаметр)
+    radius_1_ = radius_1;
+    radius_2_ = radius_2;
+    if (!circle_item_) {
+        circle_item_ = new QGraphicsEllipseItem(0, 0, radius_1 * 2, radius_2 * 2);
+    }
+    circle_item_->setPen(pen);
     SetFigureType(FigureType::ellipse_);
 }
 
 Ellipse::~Ellipse() = default;
 
-void Ellipse::MoveTo(const int dx, const int dy) {
-    position_.MoveToX(dx);
-    position_.MoveToY(dy);
-    if (ellipse_item_) {
-        ellipse_item_->setPos(position_.GetX() - radius_1_, position_.GetY() - radius_2_);
+void Ellipse::SetSize(const int w, [[maybe_unused]] const int h) {
+    w_ = radius_1_ = w / 2;
+    h_ = radius_2_ = h / 2;
+    if (circle_item_) {
+        circle_item_->setRect(circle_item_->rect().x(), circle_item_->rect().y(), radius_1_ * 2, radius_2_ * 2);
     }
 }
 
-void Ellipse::Show(QGraphicsScene *scene) {
-    if (!ellipse_item_) {
-        ellipse_item_ = new QGraphicsEllipseItem(0, 0, radius_1_ * 2, radius_2_ * 2);
+void Ellipse::Rotate(int degrees, QGraphicsScene* scene) {
+    if (!circle_item_) {
+        return;
     }
-    if (ellipse_item_ && !ellipse_item_->scene()) {
-        scene->addItem(ellipse_item_);
-    }
-    ellipse_item_->setPos(position_.GetX(), position_.GetY());
-    ellipse_item_->setPen(pen_);
-    ellipse_item_->setVisible(is_visible_);
-}
 
-void Ellipse::SetSize(const int w, const int h) {
-    w_ = w;
-    h_ = h;
-    if (ellipse_item_) {
-        // ellipse_item_->setRect(0, 0, w_, h_);
-        ellipse_item_->setRect(ellipse_item_->rect().x(), ellipse_item_->rect().y(), radius_1_ * 2, radius_2_ * 2);
-    }
-}
+    // Сохраняем текущий угол поворота для возможного восстановления
+    qreal previous_rotation = circle_item_->rotation();
 
-void Ellipse::RemoveFromScene(QGraphicsScene *scene) {
-    if (ellipse_item_ && ellipse_item_->scene() == scene) {
-        scene->removeItem(ellipse_item_);
-        delete ellipse_item_;
-        ellipse_item_ = nullptr;
+    // Применяем поворот
+    circle_item_->setRotation(previous_rotation + degrees);
+
+    // Проверяем, не выходит ли объект за границы
+    QRectF global_bounds = circle_item_->mapToScene(circle_item_->boundingRect()).boundingRect();
+    QRectF scene_bounds = scene->sceneRect();
+
+    if (!scene_bounds.contains(global_bounds)) {
+        // Если выходит за границы, откатываем поворот назад
+        circle_item_->setRotation(previous_rotation);
     }
 }

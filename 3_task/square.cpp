@@ -39,3 +39,10 @@ void Square::RemoveFromScene(QGraphicsScene* scene) {
         rect_item_ = nullptr;
     }
 }
+
+void Square::SetVisible(bool visible) {
+    is_visible_ = visible;
+}
+bool Square::GetVisible() const {
+    return is_visible_;
+}

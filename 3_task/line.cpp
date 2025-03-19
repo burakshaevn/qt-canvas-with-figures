@@ -1,60 +1,64 @@
 #include "line.h"
 
-Line::Line() = default;
+Line::Line()
+    : Figure(Point(0, 0), 0, 0)
+    , start_(0, 0)
+    , end_(0, 0)
+    , w_(0)
+    , h_(0)
+    , is_visible_(true)
+    , line_item_(nullptr)
+{}
 
 Line::Line(int x1, int y1, int x2, int y2, const QPen& pen)
-    : Figure({x1, y1}, x2 - x1, y2 - y1, pen, 3, FigureType::line_)
-    , x2_(x2)
-    , y2_(y2)
+    : Figure(Point(x1, y1), x2 - x1, y2 - y1, pen)
+    , start_(x1, y1)
+    , end_(x2, y2)
+    , w_(x2 - x1)
+    , h_(y2 - y1)
+    , is_visible_(true)
 {
     line_item_ = new QGraphicsLineItem(x1, y1, x2, y2);
-    line_item_->setPen(pen);
+    line_item_->setPen(GetPen());
     SetFigureType(FigureType::line_);
 }
 
-Line::~Line() {
-    delete line_item_;
-}
-
 void Line::MoveTo(const int dx, const int dy) {
-    // Смещаем начало и конец линии
-    // x_ += dx;
-    // y_ += dy;
-    position_.MoveToX(dx);
-    position_.MoveToY(dy);
-    x2_ += dx;
-    y2_ += dy;
+    start_.MoveToX(dx);
+    start_.MoveToY(dy);
+    end_.MoveToX(dx);
+    end_.MoveToY(dy);
 
-    // Обновляем позицию линии на сцене, если line_item_ не равен nullptr
     if (line_item_) {
-        line_item_->setLine(position_.GetX(), position_.GetY(), x2_, y2_);
+        line_item_->setLine(start_.GetX(), start_.GetY(), end_.GetX(), end_.GetY());
     }
 }
 
-void Line::SetSize(const int w, const int h) {
-    // Изменяем конечные координаты линии в зависимости от новых ширины и высоты
-    x2_ = position_.GetX() + w;
-    y2_ = position_.GetY() + h;
+void Line::SetCoords(const int x, const int y) {
+    start_.SetX(x);
+    start_.SetY(y);
+}
 
-    // Обновляем позицию линии на сцене
+void Line::SetSize(const int w, const int h) {
+    end_.SetX(start_.GetX() + w);
+    end_.SetY(start_.GetY() + h);
+    w_ = w;
+    h_ = h;
+
     if (line_item_) {
-        line_item_->setLine(position_.GetX(), position_.GetY(), x2_, y2_);
+        line_item_->setLine(start_.GetX(), start_.GetY(), end_.GetX(), end_.GetY());
     }
 }
 
 void Line::Show(QGraphicsScene *scene) {
-    // Если line_item_ еще не создан, создаем его
     if (!line_item_) {
-        line_item_ = new QGraphicsLineItem(position_.GetX(), position_.GetY(), x2_, y2_);
+        line_item_ = new QGraphicsLineItem(start_.GetX(), start_.GetY(), end_.GetX(), end_.GetY());
         line_item_->setPen(pen_);
         scene->addItem(line_item_);
-    }
-    // Если создан, но не добавлен на сцену, добавляем его
-    else if (!line_item_->scene()) {
+    } else if (!line_item_->scene()) {
         scene->addItem(line_item_);
     }
 
-    // Устанавливаем параметры видимости и пера
     line_item_->setPen(pen_);
     line_item_->setVisible(is_visible_);
 }
@@ -66,4 +70,35 @@ void Line::RemoveFromScene(QGraphicsScene* scene) {
         delete line_item_;
         line_item_ = nullptr;
     }
+}
+
+void Line::SetVisible(bool visible) {
+    is_visible_ = visible;
+}
+bool Line::GetVisible() const {
+    return is_visible_;
+}
+
+int Line::GetX() const {
+    return start_.GetX();
+}
+
+int Line::GetY() const {
+    return start_.GetY();
+}
+
+int Line::GetW() const {
+    return w_;
+}
+
+int Line::GetH() const {
+    return h_;
+}
+
+void Line::SetPen(const QPen& pen, const int pen_width) {
+    pen_ = pen;
+    pen_.setWidth(pen_width);
+}
+QPen Line::GetPen() const {
+    return pen_;
 }

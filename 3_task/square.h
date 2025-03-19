@@ -13,8 +13,8 @@ public:
     void Show(QGraphicsScene *scene) override;
     void RemoveFromScene(QGraphicsScene* scene) override;
 
-private:
-    QGraphicsRectItem* rect_item_;
+    void SetVisible(bool visible) override;
+    bool GetVisible() const override;
 };
 
 #endif // SQUARE_H

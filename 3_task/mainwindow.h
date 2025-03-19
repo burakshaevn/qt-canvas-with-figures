@@ -4,14 +4,7 @@
 #pragma once
 
 #include "figure.h"
-#include "circle.h"
-#include "ellipse.h"
-#include "rectangle.h"
-#include "square.h"
-#include "line.h"
-#include "ring.h"
 
-#include <random>
 #include <QMainWindow>
 #include <QMessageBox>
 
@@ -48,6 +41,14 @@ private slots:
 
     void on_checkBox_all_size_stateChanged(int arg1);
 
+    void on_pushButton_search_for_rotate_clicked();
+
+    void on_checkBox_all_rotate_stateChanged(int arg1);
+
+    void on_pushButton_rotate_left_clicked();
+
+    void on_pushButton_rotate_right_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -61,10 +62,15 @@ private:
 
     int GetRandomNumber(const int min, const int max) const;
 
+    std::unique_ptr<Figure> CreateFigure(FigureType type, int x, int y, int w, int h);
+
     bool CoordsIsCorrect(const int x, const int y) const;
     bool SizeIsCorrect(const int w, const int h) const;
-    bool MoveIsCorrect(Figure* figure, const int x, const int y, const int w, const int h, const int move_x, const int move_y) const;
+    bool MoveIsCorrect(const int x, const int y, const int w, const int h, const int move_x, const int move_y) const;
     bool NumberIsCorrect(const int num) const;
+
+    bool ApplyChangesToFigure(std::unique_ptr<Figure>& figure, int dx, int dy, int new_w, int new_h, bool size_fields_filled, bool coord_fields_filled);
+
     std::tuple<int, int, int, int> GetCorrectFigure() const;
 };
 #endif // MAINWINDOW_H

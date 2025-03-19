@@ -47,3 +47,56 @@ void Rectangle::RemoveFromScene(QGraphicsScene* scene) {
         rect_item_ = nullptr;
     }
 }
+
+void Rectangle::Rotate(const int degrees, QGraphicsScene* scene) {
+    if (!rect_item_) {
+        return;
+    }
+
+    // Сохраняем текущий угол поворота для возможного восстановления
+    qreal previous_rotation = rect_item_->rotation();
+
+    // Применяем поворот
+    rect_item_->setRotation(previous_rotation + degrees);
+
+    // Проверяем, не выходит ли объект за границы
+    QRectF global_bounds = rect_item_->mapToScene(rect_item_->boundingRect()).boundingRect();
+    QRectF scene_bounds = scene->sceneRect();
+
+    if (!scene_bounds.contains(global_bounds)) {
+        // Если выходит за границы, откатываем поворот назад
+        rect_item_->setRotation(previous_rotation);
+    }
+}
+
+void Rectangle::SetVisible(bool visible) {
+    is_visible_ = visible;
+}
+bool Rectangle::GetVisible() const {
+    return is_visible_;
+}
+
+void Rectangle::SetCoords(const int x, const int y){
+    position_.SetX(x);
+    position_.SetY(y);
+}
+int Rectangle::GetX() const{
+    return position_.GetX();
+}
+int Rectangle::GetY() const{
+    return position_.GetY();
+}
+int Rectangle::GetW() const{
+    return w_;
+}
+int Rectangle::GetH() const{
+    return h_;
+}
+
+void Rectangle::SetPen(const QPen& pen, const int pen_width) {
+    pen_ = pen;
+    pen_.setWidth(pen_width);
+}
+QPen Rectangle::GetPen() const {
+    return pen_;
+}

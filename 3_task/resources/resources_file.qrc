@@ -1,11 +1,13 @@
 <RCC>
     <qresource prefix="/">
-        <file>Eye off.png</file>
-        <file>Eye.png</file>
-        <file>Trash.png</file>
-        <file>Search.png</file>
         <file>Box.png</file>
-        <file>Check.png</file>
-        <file>Refresh cw.png</file>
+        <file>Corner up-left.svg</file>
+        <file>Corner up-right.svg</file>
+        <file>Check.svg</file>
+        <file>Eye off.svg</file>
+        <file>Eye.svg</file>
+        <file>Refresh ccw.svg</file>
+        <file>Search.svg</file>
+        <file>Trash.svg</file>
     </qresource>
 </RCC>

@@ -18,8 +18,23 @@ public:
     void Show(QGraphicsScene *scene) override;
     void RemoveFromScene(QGraphicsScene* scene) override;
 
+    void Rotate(const int degrees, QGraphicsScene* scene) override;
+
+    void SetVisible(bool visible) override;
+    bool GetVisible() const override;
+
+    void SetCoords(const int x, const int y) override;
+    int GetX() const override;
+    int GetY() const override;
+    int GetW() const override;
+    int GetH() const override;
+
+    void SetPen(const QPen& pen, const int pen_width) override;
+    QPen GetPen() const override;
+
 protected:
     QGraphicsRectItem* rect_item_;
+
 };
 
 #endif // RECTANGLE_H

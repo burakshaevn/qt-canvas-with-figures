@@ -3,29 +3,16 @@
 
 #pragma once
 
-#include "figure.h"
+#include "circle.h"
 
-#include <QGraphicsScene>
-#include <QGraphicsEllipseItem>
-#include <QPen>
-
-class Ellipse : public Figure {
+class Ellipse : public Circle {
 public:
     Ellipse();
-    Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::ellipse_);
-    virtual ~Ellipse();
-    void MoveTo(int x, int y) override;
-    void SetSize(const int w, const int h) override;
-    void Show(QGraphicsScene *scene) override;
-    void RemoveFromScene(QGraphicsScene* scene) override;
+    Ellipse(int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d")));
+    ~Ellipse();
+    void SetSize(const int w, [[maybe_unused]] const int h) override;
 
-protected:
-    int radius_1_;
-    int radius_2_;
-
-    // Элемент для отображения окружности. Это класс из библиотеки фрейморка Qt, представляющий графический элемент,
-    // который рисует эллипс (или окружность) на сцене в рамках холста QGraphicsView.
-    QGraphicsEllipseItem* ellipse_item_;
+    void Rotate(const int degrees, QGraphicsScene* scene) override;
 };
 
 #endif // ELLIPSE_H
