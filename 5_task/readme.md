@@ -10,7 +10,7 @@
 
 Чтобы создать фигуры всех доступных типов, необходимо выбрать в списке фигур «Все типы» и указать количество.  
 <div align="center">
-  <img src="Pasted image 20250324071614.png" alt="image"> 
+  <img src="https://github.com/user-attachments/assets/a3c7d4eb-8ab1-4b53-bfbf-d022be6a3867" alt="image"> 
 </div> 
 
 3. **Написать обработчик команды Создать, который должен в цикле создать случайный набор из 20-30 фигур со случайными параметрами и сохранить указатель на каждый из них как элемент массива.**
@@ -20,6 +20,7 @@
 4. **Написать обработчик команды Показать для прорисовки всего изображения за счет прохода по массиву с вызовом для каждого элемента массива виртуального метода Show.**
 
 В функции `void MainWindow::CreateRandomFigures();` есть следующие строки, которые реализуют это:
+
 ```cpp
 void MainWindow::CreateRandomFigures() {
     // ...
@@ -29,12 +30,14 @@ void MainWindow::CreateRandomFigures() {
 	// ...
 }
 ```
+
 4. **Написать обработчик команды Стереть только для стирания изображения всех фигур без уничтожения объектов, что дает возможность повторно нарисовать изображение.**
 
 Логику реализует кнопка:
 <div align="center">
-  <img src="Pasted image 20250324075642.png" alt="image"> 
+  <img src="https://github.com/user-attachments/assets/2678462f-9b9a-4e64-95a4-c3896ef62420" alt="image"> 
 </div> 
+
 ```cpp
 void MainWindow::on_pushButton_eye_clicked() {
     if (!figures_.empty()) {
@@ -55,8 +58,9 @@ void MainWindow::on_pushButton_eye_clicked() {
 
 Логику реализует кнопка:
 <div align="center">
-  <img src="Pasted image 20250324075924.png" alt="image"> 
+  <img src="https://github.com/user-attachments/assets/57a8ea0f-2f78-4d23-a2f2-ec23c458d6fa" alt="image"> 
 </div> 
+
 ```cpp
 void MainWindow::on_pushButton_trash_clicked() {
     if (!figures_.empty()) {
