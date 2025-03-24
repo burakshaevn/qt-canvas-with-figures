@@ -7,10 +7,9 @@
 class Rhomb : public Rectangle {
 public:
     Rhomb();
-    Rhomb(QGraphicsScene* scene, int x, int y, int side, int height, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::rhomb_);
-    virtual ~Rhomb();
+    Rhomb(QGraphicsScene* scene, int x, int y, int side, int height, const QPen& pen = QPen(QColor(123, 111, 93), 3), const FigureType& figure_type = FigureType::rhomb_);
+    ~Rhomb();
 
-    // void MoveTo(const int dx, const int dy) override;
     void SetSize(const int side, const int height) override;
     void Show() override;
     void RemoveFromScene() override;

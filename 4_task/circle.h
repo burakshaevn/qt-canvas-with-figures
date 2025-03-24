@@ -12,9 +12,8 @@
 class Circle : public Figure {
 public:
     Circle();
-    Circle(QGraphicsScene* scene, int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::ellipse_);
+    Circle(QGraphicsScene* scene, int x, int y, int radius_1, int radius_2, const QPen& pen = QPen(QColor(123, 111, 93), 3), const FigureType& figure_type = FigureType::ellipse_);
     virtual ~Circle();
-    // void MoveTo(int x, int y) override;
     void SetSize(const int w, const int h) override;
     void Show() override;
     void RemoveFromScene() override;

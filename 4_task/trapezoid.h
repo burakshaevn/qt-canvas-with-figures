@@ -7,7 +7,7 @@
 class Trapezoid : public Rectangle {
 public:
     Trapezoid();
-    Trapezoid(QGraphicsScene* scene, int x, int y, int base1, int base2, int height, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::trapezoid_);
+    Trapezoid(QGraphicsScene* scene, int x, int y, int base1, int base2, int height, const QPen& pen = QPen(QColor(123, 111, 93), 3), const FigureType& figure_type = FigureType::trapezoid_);
     virtual ~Trapezoid();
 
     // void MoveTo(const int dx, const int dy) override;

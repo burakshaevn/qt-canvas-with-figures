@@ -1,19 +1,20 @@
 #ifndef HOUSE_H
 #define HOUSE_H
 
+#include <QGraphicsScene>
+#include <QPen>
+
 #include "figure.h"
 #include "line.h"
 #include "square.h"
-#include <QGraphicsScene>
-#include <QPen>
 
 class House : public Figure {
 public:
     House();
-    House(QGraphicsScene* scene, int x, int y, int size, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
+    House(QGraphicsScene* scene, int x, int y, int size, const QPen& pen = QPen(QColor(123, 111, 93), 3));
 
-    // void MoveTo(int dx, int dy) override;
     void SetSize(int w, int h) override;
+    void UpdatePoints(const int dx, const int dy) override;
     void Show() override;
     void RemoveFromScene() override;
 

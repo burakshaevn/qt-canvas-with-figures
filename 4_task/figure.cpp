@@ -6,7 +6,7 @@ Figure::Figure()
     , w_(0)
     , h_(0)
     , is_visible_(true)
-    , pen_(QPen(QColor("#7b6f5d")))
+    , pen_(QPen(QColor(123, 111, 93)))
     , figure_type_(FigureType::not_defined_)
 {}
 
@@ -28,12 +28,18 @@ Figure::~Figure() = default;
 void Figure::MoveTo(const int dx, const int dy) {
     position_.MoveToX(dx);
     position_.MoveToY(dy);
-    // SetCoords(position_.GetX() + dx, position_.GetY() + dy);
+    UpdatePoints(dx, dy);
     Show();
 }
-void Figure::Show() {
-    // ..
+
+void Figure::UpdatePoints(const int dx, const int dy) {
+    // ...
 }
+
+void Figure::Show() {
+    // ...
+}
+
 void Figure::Rotate(const int degrees) {
     // ...
 }

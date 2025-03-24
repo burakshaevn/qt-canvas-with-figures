@@ -11,9 +11,9 @@
 class Rectangle : public Figure {
 public:
     Rectangle();
-    Rectangle(QGraphicsScene* scene, int x, int y, int width, int height, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::rectangle_);
-    virtual ~Rectangle();
-    // void MoveTo(const int dx, const int dy) override;
+    Rectangle(QGraphicsScene* scene, int x, int y, int width, int height, const QPen& pen = QPen(QColor(123, 111, 93), 3), const FigureType& figure_type = FigureType::rectangle_);
+    ~Rectangle();
+
     void SetSize(const int w, const int h) override;
     void Show() override;
     void RemoveFromScene() override;

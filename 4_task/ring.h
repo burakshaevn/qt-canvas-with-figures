@@ -3,11 +3,11 @@
 #ifndef RING_H
 #define RING_H
 
-#include "ellipse.h"
-
 #include <QGraphicsScene>
 #include <QGraphicsPathItem>
 #include <QMessageBox>
+
+#include "circle.h"
 
 class Ring : public Circle {
 private:
@@ -16,14 +16,14 @@ private:
 
 public:
     Ring();
-    Ring(QGraphicsScene* scene, int x, int y, int outer_radius_1, int inner_radius_1, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
+    Ring(QGraphicsScene* scene, int x, int y, int outer_radius_1, int inner_radius_1, const QPen& pen = QPen(QColor(123, 111, 93), 3));
+    ~Ring();
 
-    // void MoveTo(int dx, int dy) override;
     void SetCoords(const int x, const int y) override;
+    void SetSize(int outer_radius, int inner_radius) override;
+    void UpdatePoints(const int dx, const int dy) override;
     int GetX() const override;
     int GetY() const override;
-
-    void SetSize(int outer_radius, int inner_radius) override;
     int GetW() const override;
     int GetH() const override;
 

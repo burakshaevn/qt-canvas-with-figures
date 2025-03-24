@@ -7,7 +7,7 @@
 class Square : public Rectangle {
 public:
     Square();
-    Square(QGraphicsScene* scene, int x, int y, int width, const QPen& pen = QPen(QColor("#7b6f5d")));
+    Square(QGraphicsScene* scene, int x, int y, int width, const QPen& pen = QPen(QColor(123, 111, 93), 3));
     ~Square();
     void SetSize(const int w, const int h) override;
     void Show() override;

@@ -21,22 +21,11 @@ Line::Line(QGraphicsScene* scene, int x1, int y1, int x2, int y2, const QPen& pe
     SetFigureType(FigureType::line_);
 }
 
-// void Line::MoveTo(const int dx, const int dy) {
-//     start_.MoveToX(dx);
-//     start_.MoveToY(dy);
-//     end_.MoveToX(dx);
-//     end_.MoveToY(dy);
-
-//     if (line_item_) {
-//         line_item_->setLine(start_.GetX(), start_.GetY(), end_.GetX(), end_.GetY());
-//     }
-// }
-
 void Line::SetCoords(const int x, const int y) {
-    start_.MoveToX(x);
-    start_.MoveToY(y);
-    end_.MoveToX(x);
-    end_.MoveToY(y);
+    start_.SetX(x);
+    start_.SetY(y);
+    end_.SetX(x);
+    end_.SetY(y);
 }
 
 void Line::SetSize(const int w, const int h) {
@@ -50,19 +39,12 @@ void Line::SetSize(const int w, const int h) {
     }
 }
 
-// void Line::Show() {
-//     if (!line_item_) {
-//         line_item_ = new QGraphicsLineItem(start_.GetX(), start_.GetY(), end_.GetX(), end_.GetY());
-//         line_item_->setPen(pen_);
-//         scene_->addItem(line_item_);
-//     }
-//     else if (!line_item_->scene()) {
-//         scene_->addItem(line_item_);
-//     }
-
-//     line_item_->setPen(pen_);
-//     line_item_->setVisible(is_visible_);
-// }
+void Line::UpdatePoints(const int dx, const int dy){
+    start_.MoveToX(dx);
+    start_.MoveToY(dy);
+    end_.MoveToX(dx);
+    end_.MoveToY(dy);
+}
 
 void Line::Show() {
     if (!line_item_) {
@@ -74,7 +56,6 @@ void Line::Show() {
         scene_->addItem(line_item_);
     }
     else {
-        // Обновляем координаты линии
         line_item_->setLine(start_.GetX(), start_.GetY(), end_.GetX(), end_.GetY());
     }
 
@@ -83,7 +64,6 @@ void Line::Show() {
 }
 
 void Line::RemoveFromScene() {
-    // Удаляем элемент из сцены и освобождаем память
     if (line_item_ && scene_->items().contains(line_item_)) {
         scene_->removeItem(line_item_);
         delete line_item_;

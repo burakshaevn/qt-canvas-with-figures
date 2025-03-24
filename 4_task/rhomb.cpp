@@ -1,13 +1,17 @@
 #include "rhomb.h"
 
 Rhomb::Rhomb()
-    : Rectangle(), side_(0), height_(0), rhomb_item_(nullptr) {}
+    : Rectangle()
+    , side_(0)
+    , height_(0)
+    , rhomb_item_(nullptr)
+{}
 
 Rhomb::Rhomb(QGraphicsScene* scene, int x, int y, int side, int height, const QPen& pen, const FigureType& figure_type)
     : Rectangle(scene, x, y, side, height, pen, figure_type), side_(side), height_(height) {
     rhomb_item_ = new QGraphicsPolygonItem();
     SetFigureType(FigureType::rhomb_);
-    SetSize(side, height); // Инициализация формы ромба
+    SetSize(side, height);
 }
 
 Rhomb::~Rhomb() {
@@ -15,14 +19,6 @@ Rhomb::~Rhomb() {
         delete rhomb_item_;
     }
 }
-
-// void Rhomb::MoveTo(const int dx, const int dy) {
-//     position_.MoveToX(dx);
-//     position_.MoveToY(dy);
-//     if (rhomb_item_) {
-//         rhomb_item_->setPos(position_.GetX(), position_.GetY());
-//     }
-// }
 
 void Rhomb::SetSize(const int side, const int height) {
     side_ = side;

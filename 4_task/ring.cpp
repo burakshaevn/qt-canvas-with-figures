@@ -11,15 +11,17 @@ Ring::Ring(QGraphicsScene* scene, int x, int y, int outer_radius_1, int inner_ra
              << outer_radius_1 << " и внутренним радиусом " << inner_radius_1 << '.';
 }
 
-// void Ring::MoveTo(int dx, int dy) {
-//     outer_circle_.MoveTo(dx, dy);
-//     int innerX = outer_circle_.GetX() + (outer_circle_.GetW() - inner_circle_.GetW()) / 2;
-//     int innerY = outer_circle_.GetY() + (outer_circle_.GetH() - inner_circle_.GetH()) / 2;
-//     inner_circle_.SetCoords(innerX, innerY);
-// }
+Ring::~Ring() = default;
+
+void Ring::UpdatePoints(const int dx, const int dy) {
+    outer_circle_.MoveTo(dx, dy);
+    int innerX = outer_circle_.GetX() + (outer_circle_.GetW() - inner_circle_.GetW()) / 2;
+    int innerY = outer_circle_.GetY() + (outer_circle_.GetH() - inner_circle_.GetH()) / 2;
+    inner_circle_.SetCoords(innerX, innerY);
+}
+
 void Ring::SetCoords(const int x, const int y) {
     outer_circle_.SetSize(x, y);
-
     int innerX = outer_circle_.GetX() + outer_circle_.GetW() / 2 - inner_circle_.GetW() / 2;
     int innerY = outer_circle_.GetY() + outer_circle_.GetH() / 2 - inner_circle_.GetH() / 2;
     inner_circle_.SetCoords(innerX, innerY);
@@ -48,7 +50,6 @@ int Ring::GetH() const {
 void Ring::Show() {
     outer_circle_.Show();
 
-    // Обновление позиции внутреннего круга
     int innerX = outer_circle_.GetX() + outer_circle_.GetW() / 2 - inner_circle_.GetW() / 2;
     int innerY = outer_circle_.GetY() + outer_circle_.GetH() / 2 - inner_circle_.GetH() / 2;
     inner_circle_.SetCoords(innerX, innerY);

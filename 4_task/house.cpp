@@ -30,26 +30,26 @@ House::House(QGraphicsScene* scene, int x, int y, int size, const QPen& pen)
 }
 
 // Перемещение дома
-// void House::MoveTo(int dx, int dy) {
-//     // Получаем текущие координаты
-//     int newX = base_.GetX() + dx;
-//     int newY = base_.GetY() + dy;
+void House::UpdatePoints(const int dx, const int dy) {
+    // Получаем текущие координаты
+    int newX = base_.GetX() + dx;
+    int newY = base_.GetY() + dy;
 
-//     qreal sceneWidth = 1260;
-//     qreal sceneHeight = 557;
+    qreal sceneWidth = 1260;
+    qreal sceneHeight = 557;
 
-//     // Проверяем, что дом не выходит за пределы сцены
-//     if (newX < 0 || newX + base_.GetW() > sceneWidth ||
-//         newY - roof_height_ < 0 || newY + base_.GetH() > sceneHeight) {
-//         return;
-//     }
+    // Проверяем, что дом не выходит за пределы сцены
+    if (newX < 0 || newX + base_.GetW() > sceneWidth ||
+        newY - roof_height_ < 0 || newY + base_.GetH() > sceneHeight) {
+        return;
+    }
 
-//     // Перемещаем дом, если проверка пройдена
-//     base_.MoveTo(dx, dy);
-//     roof_left_.MoveTo(dx, dy);
-//     roof_right_.MoveTo(dx, dy);
-//     roof_top_.MoveTo(dx, dy);
-// }
+    // Перемещаем дом, если проверка пройдена
+    base_.MoveTo(dx, dy);
+    roof_left_.MoveTo(dx, dy);
+    roof_right_.MoveTo(dx, dy);
+    roof_top_.MoveTo(dx, dy);
+}
 
 // Установка размера дома
 void House::SetSize(int w, int h) {

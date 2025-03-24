@@ -12,14 +12,6 @@ Rectangle::Rectangle(QGraphicsScene* scene, int x, int y, int w, int h, const QP
 
 Rectangle::~Rectangle() = default;
 
-// void Rectangle::MoveTo(const int dx, const int dy) {
-//     position_.MoveToX(dx);
-//     position_.MoveToY(dy);
-//     if (rect_item_) {
-//         rect_item_->setPos(position_.GetX(), position_.GetY());
-//     }
-// }
-
 void Rectangle::SetSize(const int w, const int h) {
     w_ = w;
     h_ = h;

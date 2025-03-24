@@ -15,14 +15,6 @@ Circle::Circle(QGraphicsScene* scene, int x, int y, int radius_1, int radius_2, 
 
 Circle::~Circle() = default;
 
-// void Circle::MoveTo(const int dx, const int dy) {
-//     position_.MoveToX(dx);
-//     position_.MoveToY(dy);
-//     // if (circle_item_) {
-//     //     circle_item_->setPos(position_.GetX() - radius_1_, position_.GetY() - radius_2_);
-//     // }
-// }
-
 void Circle::SetSize(const int w, const int h) {
     radius_1_ = radius_2_ = w / 2;
     if (circle_item_) {

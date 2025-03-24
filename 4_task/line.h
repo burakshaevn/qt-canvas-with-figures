@@ -13,11 +13,11 @@
 class Line : public Figure {
 public:
     Line();
-    Line(QGraphicsScene* scene, int x1, int y1, int x2, int y2, const QPen& pen = QPen(QColor("#7b6f5d"), 3));
+    Line(QGraphicsScene* scene, int x1, int y1, int x2, int y2, const QPen& pen = QPen(QColor(123, 111, 93), 3));
 
-    // void MoveTo(const int dx, const int dy) override;
     void SetCoords(const int x, const int y) override;
     void SetSize(const int w, const int h) override;
+    void UpdatePoints(const int dx, const int dy) override;
     void Show() override;
     void RemoveFromScene() override;
 

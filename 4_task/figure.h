@@ -4,6 +4,7 @@
 #include <QGraphicsGridLayout>
 #include <QPen>
 #include <QMessageBox>
+
 #include "point.h"
 
 enum class FigureType{
@@ -22,9 +23,11 @@ enum class FigureType{
 class Figure {
 public:
     Figure();
-    Figure(QGraphicsScene* scene, Point position, int w, int h, const QPen& pen = QPen(QColor("#7b6f5d")), const int pen_width = 3, const FigureType& figure_type = FigureType::not_defined_);
+    Figure(QGraphicsScene* scene, Point position, int w, int h, const QPen& pen = QPen(QColor(123, 111, 93), 3), const int pen_width = 3, const FigureType& figure_type = FigureType::not_defined_);
 
     ~Figure();
+
+    void MoveTo(const int dx, const int dy);
 
     // Чисто виртуальные методы, которые обязан реализовать каждый наследник Figure
     // Чисто виртуальные методы это которые имеют вид virtual ... =0
@@ -34,7 +37,7 @@ public:
     // классы наследники могут её как переопределять, так и оставить такой, какой она написана в базовом классе.
     // Если класс наследник не переопределил реализацию обычной функции virtual (которая без =0),
     // то он будет использовать определение метода из базового класса
-    void MoveTo(const int dx, const int dy);
+    virtual void UpdatePoints(const int dx, const int dy);
     virtual void Show();
     virtual void Rotate(const int degrees);
 
