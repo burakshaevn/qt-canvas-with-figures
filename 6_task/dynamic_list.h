@@ -23,7 +23,8 @@ public:
     void push_back(std::unique_ptr<Figure> figure);
     void erase(size_t index);
     Figure* Get(size_t index) const;
-    void Iterate(const ActionType action, const size_t index = -1, const int dx = 0, const int dy = 0);
+    void Iterate(const ActionType action, const size_t index, const int dx = 0, const int dy = 0);
+    void Iterate(const ActionType action, const int dx = 0, const int dy = 0);
     size_t size() const;
     bool empty() const;
     Figure& at(size_t index);

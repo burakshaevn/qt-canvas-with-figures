@@ -18,9 +18,7 @@
     <normaloff>:/Box.png</normaloff>:/Box.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">QMainWindow {
-	background-color: #efefef;
-}</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGraphicsView" name="graphicsView">
@@ -1128,7 +1126,7 @@
      <widget class="QLineEdit" name="lineEdit_rotate">
       <property name="geometry">
        <rect>
-        <x>925</x>
+        <x>1120</x>
         <y>94</y>
         <width>42</width>
         <height>21</height>

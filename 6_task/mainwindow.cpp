@@ -74,7 +74,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
         for (size_t i = 0; i < container.size(); ++i) {
             if (MoveIsCorrect(container.at(i).GetX(), container.at(i).GetY(), container.at(i).GetW(), container.at(i).GetH(), dx, dy)) {
-                container.at(i).MoveTo(dx, dy);
+                container.Iterate(ActionType::MOVE, i, dx, dy);
             }
         }
     }, figures_.value());
@@ -446,24 +446,23 @@ void MainWindow::on_pushButton_ok_create_clicked() {
 
 void MainWindow::on_pushButton_trash_clicked() {
     std::visit([&](auto& container) {
-        container.Iterate(ActionType::CLEAR);
-        // if (!container.empty()) {
-        //     bool anyDeleted = false;
-        //     for (size_t i = 0; i < container.size(); ++i) {
-        //         if (current_figure_ == nullptr || container.at(i).GetFigureType() == current_figure_->GetFigureType()) {
-        //             container.at(i).RemoveFromScene();
-        //             container.erase(i);
-        //             --i;
-        //             anyDeleted = true;
-        //             ui->checkBox_all_size->setCheckState(Qt::Unchecked);
-        //         }
-        //     }
-        //     if (!anyDeleted) {
-        //         QMessageBox::information(this, "Информация", "Фигуры указанного типа отсутствуют для удаления.");
-        //     }
-        // }
-        // else {
-        //     QMessageBox::critical(this, "Ошибка", "Массив фигур пуст. Добавьте фигуры для удаления.");
+        if (!container.empty()) {
+            bool anyDeleted = false;
+            for (size_t i = 0; i < container.size(); ++i) {
+                if (current_figure_ == nullptr || container.at(i).GetFigureType() == current_figure_->GetFigureType()) {
+                    container.Iterate(ActionType::ERASE, i);
+                    --i;
+                    anyDeleted = true;
+                    ui->checkBox_all_size->setCheckState(Qt::Unchecked);
+                }
+            }
+            if (!anyDeleted) {
+                QMessageBox::information(this, "Информация", "Фигуры указанного типа отсутствуют для удаления.");
+            }
+        }
+        else {
+            QMessageBox::critical(this, "Ошибка", "Массив фигур пуст. Добавьте фигуры для удаления.");
+        }
     }, figures_.value());
 }
 
@@ -473,8 +472,7 @@ void MainWindow::on_pushButton_eye_clicked() {
             for (size_t i = 0; i < container.size(); ++i) {
                 // Если current_figure_ == nullptr, обрабатываем все фигуры, иначе только фигуры того же типа
                 if (current_figure_ == nullptr || container.at(i).GetFigureType() == current_figure_.get()->GetFigureType()) {
-                    container.at(i).SetVisible(!container.at(i).GetVisible());
-                    container.at(i).Show();
+                    container.Iterate(ActionType::HIDE, i);
                 }
             }
         } else {
@@ -585,6 +583,7 @@ void MainWindow::on_pushButton_ok_size_clicked()
                 bool is_found = false;
                 size_t index = static_cast<size_t>(ui->lineEdit_index_size->text().toInt() - 1);
                 size_t current_type_count = 0;  // Счетчик для индекса конкретного типа
+                size_t general_count = 0;
 
                 for (size_t i = 0; i < container.size(); ++i) {
                     container.at(i).SetPen(QColor(QString("#7b6f5d")), 3);
@@ -594,7 +593,7 @@ void MainWindow::on_pushButton_ok_size_clicked()
                         if (current_type_count == index) {
                             if (MoveIsCorrect(container.at(i).GetX(), container.at(i).GetY(), new_w, new_h, dx, dy)){
                                 if (coord_fields_filled) {
-                                    container.at(i).MoveTo(dx, dy);
+                                    container.Iterate(ActionType::MOVE, general_count, dx, dy);
                                 }
                                 if (size_fields_filled) {
                                     container.at(i).SetSize(new_w, new_h);
@@ -613,6 +612,7 @@ void MainWindow::on_pushButton_ok_size_clicked()
                         ++current_type_count;
                     }
                     container.at(i).Show();
+                    ++general_count;
                 }
 
                 if (!is_found) {
@@ -623,7 +623,6 @@ void MainWindow::on_pushButton_ok_size_clicked()
                 for (size_t i = 0; i < container.size(); ++i) {
                     // Проверка на совпадение типа фигуры
                     if (current_figure_ == nullptr || typeid(container.at(i)) == typeid(*current_figure_)) {
-                    // if (current_figure_ == nullptr || typeid(*figures_.value().at(i)) == typeid(*current_figure_)) {
 
                         // Проверяем, будет ли корректна конкретная фигура figures_.value().at(i),
                         // если в ней поменять X, Y, Width или Height. Если хоть один будет =false,
@@ -632,7 +631,7 @@ void MainWindow::on_pushButton_ok_size_clicked()
                         bool result2 = MoveIsCorrect(container.at(i).GetX(), container.at(i).GetY(), new_w, new_h, dx, dy);
 
                         if (coord_fields_filled and result1) {
-                            container.at(i).MoveTo(dx, dy);
+                            container.Iterate(ActionType::MOVE, i, dx, dy);
                         }
                         if (size_fields_filled and result2) {
                             container.at(i).SetSize(new_w, new_h);
@@ -723,7 +722,7 @@ void MainWindow::on_pushButton_search_for_rotate_clicked()
                         }
                         current_type_count++;  // Увеличиваем счетчик для этого типа или общего списка
                     }
-                    container.at(i).Show();
+                    container.Iterate(ActionType::SHOW);
                 }
 
                 if (!is_found) {
@@ -757,7 +756,6 @@ void MainWindow::on_checkBox_all_rotate_stateChanged(int arg1)
                     figure->SetPen(QColor(QString("#e9a000")), 5);
                     is_found = true;
                 }
-
                 figure->Show();
             }
             // Если выбран чек-бокс «Все», значит запрещаем осуществлять ввод индекса конкретной фигуры

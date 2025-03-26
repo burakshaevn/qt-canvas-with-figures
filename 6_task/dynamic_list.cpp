@@ -47,6 +47,37 @@ Figure* DynamicList::Get(size_t index) const {
 
 void DynamicList::Iterate(const ActionType action, const size_t index, const int dx, const int dy) {
     Node* current = head.get();
+    size_t counter{};
+    while (current) {
+        if (counter == index){
+            switch (action) {
+            case ActionType::MOVE:
+                current->figure->MoveTo(dx, dy);
+                break;
+            case ActionType::SHOW:
+                current->figure->Show();
+                break;
+            case ActionType::HIDE:
+                current->figure->SetVisible(!current->figure->GetVisible());
+                current->figure->Show();
+                break;
+            case ActionType::ERASE:
+                current->figure->RemoveFromScene();
+                erase(index);
+                break;
+            case ActionType::CLEAR:
+                current->figure.reset();
+                break;
+            }
+            break;
+        }
+        current = current->next.get();
+        ++counter;
+    }
+}
+
+void DynamicList::Iterate(const ActionType action, const int dx, const int dy) {
+    Node* current = head.get();
     while (current) {
         switch (action) {
         case ActionType::MOVE:
@@ -61,6 +92,7 @@ void DynamicList::Iterate(const ActionType action, const size_t index, const int
             break;
         case ActionType::ERASE:
             current->figure->RemoveFromScene();
+            current->figure.reset();
             break;
         case ActionType::CLEAR:
             current->figure.reset();

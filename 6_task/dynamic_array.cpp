@@ -26,17 +26,45 @@ Figure* DynamicArray::Get(int index) const {
 }
 
 void DynamicArray::Iterate(const ActionType action, const size_t index, const int dx, const int dy) {
-    for (size_t i = 0; i < size_; ++i) {
+    if (index >= 0 && index < size_){
+        switch (action) {
+        case ActionType::MOVE:
+            data_[index]->MoveTo(dx, dy);
+            break;
+        case ActionType::SHOW:
+            data_[index]->Show();
+            break;
+        case ActionType::HIDE:
+            data_[index]->SetVisible(!data_[index]->GetVisible());
+            data_[index]->Show();
+            break;
+        case ActionType::ERASE:
+            data_[index]->RemoveFromScene();
+            erase(index);
+            break;
+        case ActionType::CLEAR:
+            data_[index].reset();
+            break;
+        }
+    }
+}
+
+void DynamicArray::Iterate(const ActionType action, const int dx, const int dy) {
+    for(size_t i = 0; i < size_; ++i) {
         switch (action) {
         case ActionType::MOVE:
             data_[i]->MoveTo(dx, dy);
             break;
-        // case ActionType::SHOW:
-        //     data_[i]->Show();
-        //     break;
+        case ActionType::SHOW:
+            data_[i]->Show();
+            break;
         case ActionType::HIDE:
             data_[i]->SetVisible(!data_[i]->GetVisible());
             data_[i]->Show();
+            break;
+        case ActionType::ERASE:
+            data_[i]->RemoveFromScene();
+            data_[i].reset();
             break;
         case ActionType::CLEAR:
             data_[i].reset();
