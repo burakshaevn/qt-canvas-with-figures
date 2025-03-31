@@ -1,10 +1,15 @@
 #include "trapezoid.h"
 
 Trapezoid::Trapezoid()
-    : Rectangle(), base1_(0), base2_(0), height_(0), trapezoid_item_(nullptr) {}
+    : Quadrilateral()
+    , base1_(0)
+    , base2_(0)
+    , height_(0)
+    , trapezoid_item_(nullptr)
+{}
 
 Trapezoid::Trapezoid(int x, int y, int base1, int base2, int height, const QPen& pen, const FigureType& figure_type)
-    : Rectangle(x, y, base1, height, pen, figure_type), base1_(base1), base2_(base2), height_(height) {
+    : Quadrilateral(x, y, base1, height, pen, figure_type), base1_(base1), base2_(base2), height_(height) {
     trapezoid_item_ = new QGraphicsPolygonItem();
     SetFigureType(FigureType::trapezoid_);
     SetSize(base1, base2, height); // Инициализация формы трапеции

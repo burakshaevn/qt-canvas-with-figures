@@ -2,9 +2,9 @@
 #define SQUARE_H
 #pragma once
 
-#include "rectangle.h"
+#include "quadrilateral.h"
 
-class Square : public Rectangle {
+class Square : public Quadrilateral {
 public:
     Square();
     Square(int x, int y, int width, const QPen& pen = QPen(QColor("#7b6f5d")));

@@ -1,10 +1,10 @@
 #ifndef TRAPEZOID_H
 #define TRAPEZOID_H
 
-#include "rectangle.h"
+#include "quadrilateral.h"
 #include <QGraphicsPolygonItem>
 
-class Trapezoid : public Rectangle {
+class Trapezoid : public Quadrilateral {
 public:
     Trapezoid();
     Trapezoid(int x, int y, int base1, int base2, int height, const QPen& pen = QPen(QColor("#7b6f5d")), const FigureType& figure_type = FigureType::trapezoid_);
