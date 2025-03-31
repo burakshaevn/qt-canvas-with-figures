@@ -17,7 +17,8 @@ enum class FigureType{
     ring_,
     house_,
     trapezoid_,
-    rhomb_
+    rhomb_,
+    quadrilateral_
 };
 
 class Figure {
