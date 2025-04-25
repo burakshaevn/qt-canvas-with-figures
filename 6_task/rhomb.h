@@ -1,10 +1,10 @@
 #ifndef Rhomb_H
 #define Rhomb_H
 
-#include "rectangle.h"
+#include "quadrilateral.h"
 #include <QGraphicsPolygonItem>
 
-class Rhomb : public Rectangle {
+class Rhomb : public Quadrilateral {
 public:
     Rhomb();
     Rhomb(QGraphicsScene* scene, int x, int y, int side, int height, const QPen& pen = QPen(QColor(123, 111, 93), 3), const FigureType& figure_type = FigureType::rhomb_);

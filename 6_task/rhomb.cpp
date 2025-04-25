@@ -1,14 +1,14 @@
 #include "rhomb.h"
 
 Rhomb::Rhomb()
-    : Rectangle()
+    : Quadrilateral()
     , side_(0)
     , height_(0)
     , rhomb_item_(nullptr)
 {}
 
 Rhomb::Rhomb(QGraphicsScene* scene, int x, int y, int side, int height, const QPen& pen, const FigureType& figure_type)
-    : Rectangle(scene, x, y, side, height, pen, figure_type), side_(side), height_(height) {
+    : Quadrilateral(scene, x, y, side, height, pen, figure_type), side_(side), height_(height) {
     rhomb_item_ = new QGraphicsPolygonItem();
     SetFigureType(FigureType::rhomb_);
     SetSize(side, height);

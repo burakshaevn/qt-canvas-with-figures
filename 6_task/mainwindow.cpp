@@ -93,6 +93,7 @@ void MainWindow::FillComboBox(){
     ui->comboBox->addItem("Дом");
     ui->comboBox->addItem("Трапеция");
     ui->comboBox->addItem("Ромб");
+    ui->comboBox->addItem("Четырехугольник");
 }
 
 void MainWindow::SetLineEditSettings() {
@@ -241,6 +242,8 @@ std::unique_ptr<Figure> MainWindow::CreateFigure(FigureType type, int x, int y, 
         return std::make_unique<Trapezoid>(scene.get(), x, y, w, w / 2, h);
     case FigureType::rhomb_:
         return std::make_unique<Rhomb>(scene.get(), x, y, w, h);
+    case FigureType::quadrilateral_:
+        return std::make_unique<Quadrilateral>(scene.get(), x, y, w, h);
     default:
         throw std::invalid_argument("Unknown figure type");
     }
@@ -366,6 +369,10 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
     case 9:
         current_figure_ = std::make_unique<Rhomb>();
         current_figure_.get()->SetFigureType(FigureType::rhomb_);
+        break;
+    case 10:
+        current_figure_ = std::make_unique<Quadrilateral>();
+        current_figure_.get()->SetFigureType(FigureType::quadrilateral_);
         break;
     }
 }

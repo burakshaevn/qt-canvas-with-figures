@@ -18,6 +18,7 @@ enum class FigureType {
     house_,
     trapezoid_,
     rhomb_,
+    quadrilateral_,
     all_figures_
 };
 

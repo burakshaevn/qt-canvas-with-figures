@@ -1,7 +1,7 @@
 #include "trapezoid.h"
 
 Trapezoid::Trapezoid()
-    : Rectangle()
+    : Quadrilateral()
     , base1_(0)
     , base2_(0)
     , height_(0)
@@ -9,13 +9,17 @@ Trapezoid::Trapezoid()
 {}
 
 Trapezoid::Trapezoid(QGraphicsScene* scene, int x, int y, int base1, int base2, int height, const QPen& pen, const FigureType& figure_type)
-    : Rectangle(scene, x, y, base1, height, pen, figure_type), base1_(base1), base2_(base2), height_(height) {
+    : Quadrilateral(scene, x, y, base1, height, pen, figure_type), base1_(base1), base2_(base2), height_(height) {
     trapezoid_item_ = new QGraphicsPolygonItem();
     SetFigureType(FigureType::trapezoid_);
     SetSize(base1, base2, height);
 }
 
-Trapezoid::~Trapezoid() = default;
+Trapezoid::~Trapezoid() {
+    if (trapezoid_item_) {
+        delete trapezoid_item_;
+    }
+}
 
 void Trapezoid::SetSize(const int base1, const int base2, const int height) {
     base1_ = base1;

@@ -3,7 +3,7 @@
 Square::Square() = default;
 
 Square::Square(QGraphicsScene* scene, int x, int y, int w, const QPen& pen)
-    : Rectangle(scene, x, y, w, w, pen, FigureType::square_)
+    : Quadrilateral(scene, x, y, w, w, pen, FigureType::square_)
 {
     rect_item_ = new QGraphicsRectItem(0, 0, w, w);
     rect_item_->setPen(pen);

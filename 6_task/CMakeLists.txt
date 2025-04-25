@@ -37,6 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         rhomb.h rhomb.cpp
         dynamic_array.h dynamic_array.cpp
         dynamic_list.h dynamic_list.cpp
+        quadrilateral.h quadrilateral.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET 6_task APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
