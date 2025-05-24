@@ -19,7 +19,7 @@ public:
     void SetVisible(bool visible) override;
     bool GetVisible() const override;
 
-    void Rotate(const int degrees) override;
+    void RotateQuadrilateral(const int degrees);
 
     void SetCoords(const int x, const int y) override;
     int GetX() const override;

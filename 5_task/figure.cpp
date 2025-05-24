@@ -40,10 +40,6 @@ void Figure::Show() {
     // ...
 }
 
-void Figure::Rotate(const int degrees) {
-    // ...
-}
-
 void Figure::SetCoords(const int x, const int y){
     position_.SetX(x);
     position_.SetY(y);

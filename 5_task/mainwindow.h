@@ -53,15 +53,23 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    // Указатель на холст
     std::unique_ptr<QGraphicsScene> scene;
+
     std::unique_ptr<Figure> current_figure_;
+
+    // Вектор указателей на фигуры, которые расположены в данный момент на холсте
     std::vector<std::unique_ptr<Figure>> figures_;
 
+    // Перегрузка функции-обработчика,
+    // которая обрабатывает нажатие на кнопки (для перемещения фигур)
     void keyPressEvent(QKeyEvent *event) override;
 
     void FillComboBox();
     void SetLineEditSettings();
     void ClearLineEdit();
+
+    void Rotate(Figure* figure, const int degrees);
 
     int GetRandomNumber(const int min, const int max) const;
 

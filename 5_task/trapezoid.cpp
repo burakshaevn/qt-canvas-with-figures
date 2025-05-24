@@ -61,7 +61,7 @@ void Trapezoid::RemoveFromScene() {
     }
 }
 
-void Trapezoid::Rotate(const int degrees) {
+void Trapezoid::RotateTrapezoid(const int degrees) {
     if (!trapezoid_item_) {
         return;
     }

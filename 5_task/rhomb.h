@@ -14,7 +14,7 @@ public:
     void Show() override;
     void RemoveFromScene() override;
 
-    void Rotate(const int degrees) override;
+    void RotateRhomb(const int degrees);
 
 protected:
     QGraphicsPolygonItem* rhomb_item_;

@@ -56,7 +56,7 @@ bool Quadrilateral::GetVisible() const {
     return is_visible_;
 }
 
-void Quadrilateral::Rotate(const int degrees) {
+void Quadrilateral::RotateQuadrilateral(const int degrees) {
     if (!rect_item_) return;
 
     qreal previous_rotation = rect_item_->rotation();

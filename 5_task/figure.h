@@ -41,7 +41,6 @@ public:
     // то он будет использовать определение метода из базового класса
     virtual void UpdatePoints(const int dx, const int dy);
     virtual void Show();
-    virtual void Rotate(const int degrees);
 
     virtual void SetCoords(const int x, const int y);
     virtual int GetX() const;

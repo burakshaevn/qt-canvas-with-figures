@@ -59,7 +59,7 @@ void Rhomb::RemoveFromScene() {
     }
 }
 
-void Rhomb::Rotate(const int degrees) {
+void Rhomb::RotateRhomb(const int degrees) {
     if (!rhomb_item_) {
         return;
     }

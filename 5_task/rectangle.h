@@ -18,7 +18,7 @@ public:
     void Show() override;
     void RemoveFromScene() override;
 
-    void Rotate(const int degrees) override;
+    void RotateRectangle(const int degrees);
 
 protected:
     QGraphicsRectItem* rect_item_;

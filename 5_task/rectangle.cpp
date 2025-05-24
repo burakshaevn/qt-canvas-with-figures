@@ -40,7 +40,7 @@ void Rectangle::RemoveFromScene() {
     }
 }
 
-void Rectangle::Rotate(const int degrees) {
+void Rectangle::RotateRectangle(const int degrees) {
     if (!rect_item_) {
         return;
     }

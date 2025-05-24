@@ -15,7 +15,7 @@ public:
     void Show() override;
     void RemoveFromScene() override;
 
-    void Rotate(const int degrees) override;
+    void RotateTrapezoid(const int degrees);
 
 protected:
     QGraphicsPolygonItem* trapezoid_item_;
