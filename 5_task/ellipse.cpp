@@ -25,7 +25,7 @@ void Ellipse::SetSize(const int w, [[maybe_unused]] const int h) {
     }
 }
 
-void Ellipse::Rotate(int degrees) {
+void Ellipse::RotateEllipse(int degrees) {
     if (!circle_item_) {
         return;
     }

@@ -35,6 +35,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         house.h house.cpp
         trapezoid.h trapezoid.cpp
         rhomb.h rhomb.cpp
+        quadrilateral.h quadrilateral.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET 5_task APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

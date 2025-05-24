@@ -12,7 +12,7 @@ public:
     ~Ellipse();
     void SetSize(const int w, [[maybe_unused]] const int h) override;
 
-    void Rotate(const int degrees) override;
+    void RotateEllipse(const int degrees);
 };
 
 #endif // ELLIPSE_H

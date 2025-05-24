@@ -3,7 +3,7 @@
 Rectangle::Rectangle() = default;
 
 Rectangle::Rectangle(QGraphicsScene* scene, int x, int y, int w, int h, const QPen& pen, const FigureType& figure_type)
-    : Figure(scene, {x, y}, w, h, pen, 3, figure_type)
+    : Quadrilateral(scene, x, y, w, h, pen, figure_type)
 {
     rect_item_ = new QGraphicsRectItem(0, 0, w, h);
     rect_item_->setPen(pen);
@@ -40,7 +40,7 @@ void Rectangle::RemoveFromScene() {
     }
 }
 
-void Rectangle::Rotate(const int degrees) {
+void Rectangle::RotateRectangle(const int degrees) {
     if (!rect_item_) {
         return;
     }
